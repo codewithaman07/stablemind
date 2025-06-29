@@ -1,14 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface MoodTrackerProps {
-  onBack: () => void;
-}
+import { useRouter } from 'next/navigation';
 
 interface MoodEntry {
   date: string;
-  mood: number; // 1-5 scale
+  mood: number; 
   moodLabel: string;
   note: string;
   color: string;
@@ -51,7 +48,8 @@ const motivationalQuotes: Quote[] = [
   }
 ];
 
-export default function MoodTracker({ onBack }: MoodTrackerProps) {
+export default function MoodTracker() {
+  const router = useRouter();
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState('');
   const [moodHistory, setMoodHistory] = useState<MoodEntry[]>([]);
@@ -215,7 +213,7 @@ export default function MoodTracker({ onBack }: MoodTrackerProps) {
 
           <div className="text-center pt-4">
             <button
-              onClick={onBack}
+              onClick={() => router.push('/')}
               className="px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
             >
               ← Back to Tools
