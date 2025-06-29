@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import DocumentUpload from "../components/DocumentUpload";
 import { FaArrowLeft } from "react-icons/fa";
@@ -28,7 +27,7 @@ export default function DocumentsPage() {
           
           <div className="mb-6">
             <p className="text-gray-700 dark:text-gray-300">
-              Upload your own documents to enhance StableMind's responses with personalized context.
+              Upload your own documents to enhance StableMind&apos;s responses with personalized context.
               Your documents will be processed locally in your browser and used to provide more relevant
               answers tailored to your specific needs.
             </p>
@@ -46,7 +45,7 @@ export default function DocumentsPage() {
                 No document content is sent to our servers.
               </li>
               <li>
-                <strong>Local Storage:</strong> Document content is stored locally in your browser's storage.
+                <strong>Local Storage:</strong> Document content is stored locally in your browser&apos;s storage.
                 Clearing your browser data will remove these documents.
               </li>
               <li>

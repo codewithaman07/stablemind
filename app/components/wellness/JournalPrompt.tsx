@@ -141,7 +141,7 @@ Format your response with simple HTML formatting for readability.`;
               How are you feeling right now?
             </h3>
             <p className="text-gray-300 text-center mb-6 text-sm sm:text-base">
-              Choose the mood that best describes how you're feeling today.
+              Choose the mood that best describes how you&apos;re feeling today.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               {moodOptions.map((mood) => (
@@ -168,20 +168,20 @@ Format your response with simple HTML formatting for readability.`;
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-white">Feeling {selectedMood.label}</h3>
-                <p className="text-gray-400 text-sm">Let's explore this together</p>
+                <p className="text-gray-400 text-sm">Let&apos;s explore this together</p>
               </div>
             </div>
 
             <div className="bg-gray-800 rounded-lg p-4 mb-4">
               <p className="text-gray-300 text-sm sm:text-base italic">
-                "{selectedMood.prompt}"
+                &ldquo;{selectedMood.prompt}&rdquo;
               </p>
             </div>
 
             <textarea
               value={journalEntry}
               onChange={(e) => setJournalEntry(e.target.value)}
-              placeholder="Start writing about your feelings... There's no right or wrong way to express yourself."
+              placeholder="Start writing about your feelings... There&apos;s no right or wrong way to express yourself."
               className="w-full h-64 sm:h-80 p-4 bg-gray-800 text-white rounded-lg border border-gray-700 focus:border-indigo-500 focus:outline-none resize-none text-sm sm:text-base"
               maxLength={2000}
             />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaUpload, FaTrash, FaFile, FaFilePdf, FaFileWord, FaFileExcel, FaFileAlt, FaQuestion } from 'react-icons/fa';
+import { FaTrash, FaFile, FaFilePdf, FaFileWord, FaFileExcel, FaFileAlt } from 'react-icons/fa';
 import { processDocument, getAllDocuments, deleteDocument, UserDocument } from '../services/documentService';
 
 export default function DocumentUpload() {
@@ -39,8 +39,9 @@ export default function DocumentUpload() {
       } else {
         setError("Failed to process document. Please try another file or format.");
       }
-    } catch (err: any) {
-      setError(err.message || "An error occurred during upload");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred during upload";
+      setError(errorMessage);
       console.error("Document upload error:", err);
     } finally {
       setIsUploading(false);
@@ -80,7 +81,7 @@ export default function DocumentUpload() {
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Add Custom Knowledge</h2>
       <p className="text-gray-600 dark:text-gray-300 mb-4">
-        Upload your own documents to enhance StableMind's responses with personalized context.
+        Upload your own documents to enhance StableMind&apos;s responses with personalized context.
       </p>
       
       {/* Success/Error messages */}

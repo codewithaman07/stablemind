@@ -58,14 +58,12 @@ export default function MoodTracker({ onBack }: MoodTrackerProps) {
   const [currentQuote, setCurrentQuote] = useState<Quote>(motivationalQuotes[0]);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Load mood history from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('moodHistory');
     if (saved) {
       setMoodHistory(JSON.parse(saved));
     }
     
-    // Set random motivational quote
     const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
     setCurrentQuote(randomQuote);
   }, []);
@@ -77,7 +75,7 @@ export default function MoodTracker({ onBack }: MoodTrackerProps) {
     if (!moodOption) return;
 
     const newEntry: MoodEntry = {
-      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+      date: new Date().toISOString().split('T')[0],
       mood: selectedMood,
       moodLabel: moodOption.label,
       note: note.trim(),
@@ -85,19 +83,16 @@ export default function MoodTracker({ onBack }: MoodTrackerProps) {
       emoji: moodOption.emoji
     };
 
-    const updatedHistory = [newEntry, ...moodHistory.slice(0, 6)]; // Keep last 7 entries
+    const updatedHistory = [newEntry, ...moodHistory.slice(0, 6)];
     setMoodHistory(updatedHistory);
     localStorage.setItem('moodHistory', JSON.stringify(updatedHistory));
 
-    // Reset form
     setSelectedMood(null);
     setNote('');
     setShowSuccess(true);
     
-    // Hide success message after 3 seconds
     setTimeout(() => setShowSuccess(false), 3000);
 
-    // Get new motivational quote
     const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
     setCurrentQuote(randomQuote);
   };
@@ -116,118 +111,117 @@ export default function MoodTracker({ onBack }: MoodTrackerProps) {
   const trend = getMoodTrend();
 
   return (
-    <div className="flex flex-col bg-gray-900 rounded-lg shadow-lg overflow-hidden h-full">
-      <div className="p-3 bg-gray-800 text-white">
-        <h2 className="text-lg font-medium">Mood Tracker</h2>
-        <p className="text-sm text-gray-400">Track your daily emotional wellbeing</p>
+    <div className="min-h-screen w-full bg-gray-900 flex flex-col">
+      <div className="w-full p-4 sm:p-6 bg-gray-800 text-white">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Mood Tracker</h1>
+          <p className="text-gray-400">Track your daily emotional wellbeing and stay motivated</p>
+        </div>
       </div>
 
-      <div className="flex-1 p-3 overflow-y-auto">
-        {/* Success Message */}
-        {showSuccess && (
-          <div className="bg-green-900 border border-green-700 text-green-300 p-2 rounded-lg mb-3 text-sm">
-            Mood logged successfully! 🎉
+      <div className="flex-1 w-full p-4 sm:p-6 overflow-y-auto">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {showSuccess && (
+            <div className="bg-green-900 border border-green-700 text-green-300 p-4 rounded-lg text-center">
+              <span className="text-2xl mr-2">🎉</span>
+              Mood logged successfully!
+            </div>
+          )}
+
+          <div className="bg-gradient-to-r from-indigo-900 to-purple-900 rounded-xl p-6 border border-indigo-700">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">💫</span>
+              <h2 className="text-xl font-semibold text-white">Daily Inspiration</h2>
+            </div>
+            <blockquote className="text-lg text-indigo-200 italic mb-3 leading-relaxed">
+              &ldquo;{currentQuote.quote}&rdquo;
+            </blockquote>
+            <p className="text-indigo-300 text-right">— {currentQuote.author}</p>
           </div>
-        )}
 
-        {/* Motivational Quote */}
-        <div className="bg-indigo-900 rounded-lg p-3 mb-4 border border-indigo-700">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">💫</span>
-            <h3 className="text-sm font-semibold text-white">Inspiration</h3>
-          </div>
-          <blockquote className="text-sm text-indigo-200 italic mb-1 leading-relaxed">
-            "{currentQuote.quote}"
-          </blockquote>
-          <p className="text-indigo-300 text-xs text-right">— {currentQuote.author}</p>
-        </div>
-
-        {/* Mood Selection */}
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-white mb-2">How are you feeling today?</h3>
-          <div className="grid grid-cols-5 gap-1">
-            {moodOptions.map((mood) => (
-              <button
-                key={mood.value}
-                onClick={() => setSelectedMood(mood.value)}
-                className={`p-2 rounded-lg transition-all ${
-                  selectedMood === mood.value
-                    ? `${mood.color} text-white scale-105`
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                <div className="text-lg mb-1">{mood.emoji}</div>
-                <div className="text-xs font-medium">{mood.label}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Note Input */}
-        {selectedMood && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-white mb-1">
-              Add a note (optional)
-            </label>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="What's on your mind?"
-              className="w-full p-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:border-indigo-500 focus:outline-none resize-none text-sm"
-              rows={2}
-              maxLength={200}
-            />
-            <div className="text-xs text-gray-400 mt-1">{note.length}/200</div>
-          </div>
-        )}
-
-        {/* Save Button */}
-        {selectedMood && (
-          <button
-            onClick={saveMoodEntry}
-            className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors mb-4"
-          >
-            Log Mood
-          </button>
-        )}
-
-        {/* Mood Trend */}
-        {trend && (
-          <div className="bg-gray-800 rounded-lg p-3 mb-4">
-            <h4 className="text-sm font-semibold text-white mb-1">Recent Trend</h4>
-            <p className={`text-sm ${trend.color}`}>{trend.message}</p>
-          </div>
-        )}
-
-        {/* Mood History */}
-        {moodHistory.length > 0 && (
-          <div className="mb-4">
-            <h4 className="text-sm font-semibold text-white mb-2">Recent Entries</h4>
-            <div className="space-y-2 max-h-32 overflow-y-auto">
-              {moodHistory.slice(0, 3).map((entry, index) => (
-                <div key={index} className="bg-gray-800 rounded-md p-2 border border-gray-700">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">{entry.emoji}</span>
-                      <span className="text-sm text-white">{entry.moodLabel}</span>
-                    </div>
-                    <span className="text-xs text-gray-400">{entry.date}</span>
-                  </div>
-                  {entry.note && (
-                    <p className="text-xs text-gray-300 italic">"{entry.note}"</p>
-                  )}
-                </div>
+          <div className="bg-gray-800 rounded-xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">How are you feeling today?</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+              {moodOptions.map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => setSelectedMood(mood.value)}
+                  className={`p-4 sm:p-6 rounded-xl transition-all transform hover:scale-105 ${
+                    selectedMood === mood.value
+                      ? `${mood.color} text-white scale-105 shadow-lg`
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  <div className="text-3xl sm:text-4xl mb-2">{mood.emoji}</div>
+                  <div className="text-sm sm:text-base font-medium">{mood.label}</div>
+                </button>
               ))}
             </div>
           </div>
-        )}
 
-        <button
-          onClick={onBack}
-          className="w-full px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
-        >
-          Back to Tools
-        </button>
+          {selectedMood && (
+            <div className="bg-gray-800 rounded-xl p-6">
+              <label className="block text-lg font-semibold text-white mb-3">
+                Add a note (optional)
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="What's on your mind? Share your thoughts..."
+                className="w-full p-4 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-indigo-500 focus:outline-none resize-none text-base"
+                rows={4}
+                maxLength={200}
+              />
+              <div className="flex justify-between items-center mt-3">
+                <div className="text-sm text-gray-400">{note.length}/200 characters</div>
+                <button
+                  onClick={saveMoodEntry}
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  Log My Mood
+                </button>
+              </div>
+            </div>
+          )}
+
+          {trend && (
+            <div className="bg-gray-800 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-2">Your Recent Trend</h3>
+              <p className={`text-lg ${trend.color} font-medium`}>{trend.message}</p>
+            </div>
+          )}
+
+          {moodHistory.length > 0 && (
+            <div className="bg-gray-800 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Recent Entries</h3>
+              <div className="grid gap-4">
+                {moodHistory.slice(0, 5).map((entry, index) => (
+                  <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{entry.emoji}</span>
+                        <span className="text-white font-medium">{entry.moodLabel}</span>
+                      </div>
+                      <span className="text-gray-400 text-sm">{new Date(entry.date).toLocaleDateString()}</span>
+                    </div>
+                    {entry.note && (
+                      <p className="text-gray-300 italic pl-9">&ldquo;{entry.note}&rdquo;</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="text-center pt-4">
+            <button
+              onClick={onBack}
+              className="px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+            >
+              ← Back to Tools
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

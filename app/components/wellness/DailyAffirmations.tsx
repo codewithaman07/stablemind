@@ -172,7 +172,7 @@ Make them relevant to ${category} and perfect for someone facing career challeng
             </div>
             
             <blockquote className="text-sm text-white mb-2 italic leading-relaxed">
-              "{quoteOfTheDay.quote}"
+              &ldquo;{quoteOfTheDay.quote}&rdquo;
             </blockquote>
             
             <p className="text-purple-300 text-xs text-right">— {quoteOfTheDay.author}</p>
@@ -233,7 +233,7 @@ Make them relevant to ${category} and perfect for someone facing career challeng
                   className="bg-gray-800 rounded-md p-3 border border-gray-700"
                 >
                   <blockquote className="text-gray-200 text-xs mb-1 italic">
-                    "{quote.quote.length > 100 ? quote.quote.substring(0, 100) + '...' : quote.quote}"
+                    &ldquo;{quote.quote.length > 100 ? quote.quote.substring(0, 100) + '...' : quote.quote}&rdquo;
                   </blockquote>
                   <p className="text-gray-400 text-xs text-right">— {quote.author}</p>
                 </div>

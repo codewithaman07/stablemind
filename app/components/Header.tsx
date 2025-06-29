@@ -18,12 +18,11 @@ export default function Header() {
           </h1>
         </div>
         
-        {/* Desktop Nav */}
         <div className="hidden md:flex items-center space-x-8">
           <div className="space-x-6">
-            <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Features</a>
-            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Resources</a>
-            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">About</a>
+            <a href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Features</a>
+            <a href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Resources</a>
+            {/* <a href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">About</a> */}
           </div>
           
           <div className="flex items-center space-x-3">
@@ -41,8 +40,7 @@ export default function Header() {
             </button>
           </div>
         </div>
-        
-        {/* Mobile Nav Toggle */}
+
         <button 
           className="md:hidden text-gray-500 dark:text-gray-400 focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -51,31 +49,31 @@ export default function Header() {
         </button>
       </div>
       
-      {/* Mobile Nav Menu */}
+
       {menuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-b-lg p-4 md:hidden">
           <div className="flex flex-col space-y-3">
             <a 
-              href="#features" 
+              href="/dashboard" 
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200"
               onClick={() => setMenuOpen(false)}
             >
               Features
             </a>
             <a 
-              href="#" 
+              href="/dashboard" 
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200"
               onClick={() => setMenuOpen(false)}
             >
               Resources
             </a>
-            <a 
-              href="#" 
+            {/* <a 
+              href="/dashboard" 
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200"
               onClick={() => setMenuOpen(false)}
             >
               About
-            </a>
+            </a> */}
             <hr className="border-gray-200 dark:border-gray-700" />
             <button 
               onClick={() => {

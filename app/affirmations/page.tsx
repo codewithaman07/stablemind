@@ -131,6 +131,13 @@ export default function AffirmationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [pageWidth, setPageWidth] = useState<string>('max-w-6xl');
 
+  const widthOptions = [
+    { value: 'max-w-2xl', label: 'Narrow' },
+    { value: 'max-w-4xl', label: 'Medium' },
+    { value: 'max-w-6xl', label: 'Wide' },
+    { value: 'max-w-full', label: 'Full Width' }
+  ];
+
   useEffect(() => {
     const today = new Date().toDateString();
     const cachedQuote = localStorage.getItem('quoteOfTheDay');
@@ -252,6 +259,22 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Daily Affirmations</h1>
               <p className="text-gray-400">Start your day with inspiration and positivity</p>
             </div>
+            
+            {/* Width Control */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-400">Width:</span>
+              <select 
+                value={pageWidth}
+                onChange={(e) => setPageWidth(e.target.value)}
+                className="bg-gray-800 text-white px-3 py-1 rounded-lg border border-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                {widthOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Quote of the Day */}
@@ -277,7 +300,7 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
               </div>
               
               <blockquote className="text-lg sm:text-xl text-white mb-4 italic leading-relaxed">
-                "{quoteOfTheDay.quote}"
+                &ldquo;{quoteOfTheDay.quote}&rdquo;
               </blockquote>
               
               <p className="text-purple-300 text-right">— {quoteOfTheDay.author}</p>
@@ -339,7 +362,7 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
                     className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
                   >
                     <blockquote className="text-gray-200 mb-2 italic">
-                      "{quote.quote}"
+                      &ldquo;{quote.quote}&rdquo;
                     </blockquote>
                     <p className="text-gray-400 text-sm text-right">— {quote.author}</p>
                   </div>

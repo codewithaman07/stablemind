@@ -6,12 +6,9 @@ import SupportSection from "./components/SupportSection";
 import Footer from "./components/Footer";
 
 import { FaChevronDown } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Home() {
-  const router = useRouter();
-  
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -33,11 +30,11 @@ export default function Home() {
               Your Mental Health Companion for Placement Season
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300">
-              You're Not Alone in This Journey
+              You&apos;re Not Alone in This Journey
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
-              The placement season can be challenging, but your worth isn't defined by
-              job offers. Let's work together to maintain your mental well-being.
+              The placement season can be challenging, but your worth isn&apos;t defined by
+              job offers. Let&apos;s work together to maintain your mental well-being.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/dashboard">

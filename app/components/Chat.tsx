@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { chatWithGemini } from "../services/geminiService";
 import { retrieveRelevantContent } from "../services/ragService";
-import { FaArrowRight, FaExclamationTriangle, FaFileUpload } from "react-icons/fa";
+import { FaArrowRight, FaFileUpload } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { detectCrisis, mentalHealthHelplines } from "../services/crisisDetection";
 import { useChatContext } from "../context/ChatContext";

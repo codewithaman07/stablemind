@@ -12,7 +12,7 @@ export default function FeatureCards() {
       description: "Set achievable goals and track your placement preparation progress",
       color: "from-blue-500 to-indigo-600",
       textColor: "text-blue-100",
-      path: "/goals"
+      path: "/dashboard"
     },
     {
       icon: "💭",
@@ -20,7 +20,7 @@ export default function FeatureCards() {
       description: "Practice guided meditation and stress-relief techniques during placement season",
       color: "from-purple-500 to-indigo-600",
       textColor: "text-purple-100",
-      path: "/mindful"
+      path: "/dashboard"
     },
     {
       icon: "🤝",
@@ -28,15 +28,15 @@ export default function FeatureCards() {
       description: "Connect with others who understand the placement journey challenges",
       color: "from-pink-500 to-rose-600",
       textColor: "text-pink-100",
-      path: "/community"
+      path: "/dashboard"
     },
     {
       icon: "📚",
-      title: "Resources Library",
-      description: "Access interview guides, resume templates and placement materials",
+      title: "Affirmations",
+      description: "Motivational quotes and articles to keep you inspired",
       color: "from-emerald-500 to-teal-600",
       textColor: "text-emerald-100",
-      path: "/library"
+      path: "/affirmations"
     },
     {
       icon: "📊",
@@ -52,7 +52,7 @@ export default function FeatureCards() {
       description: "Upload resumes and materials for personalized placement advice",
       color: "from-cyan-500 to-blue-600",
       textColor: "text-cyan-100",
-      path: "/documents"
+      path: "/dashboard"
     }
   ];
 

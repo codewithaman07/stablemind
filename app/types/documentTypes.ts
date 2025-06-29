@@ -6,7 +6,7 @@ export interface ParseResult {
     title?: string;
     author?: string;
     creationDate?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
   };
   error?: string;
 }
@@ -15,5 +15,5 @@ export interface DocumentChunk {
   id: string;
   documentId: string;
   content: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean>;
 }

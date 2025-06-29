@@ -103,7 +103,7 @@ export default function BreathingExercise({ onBack }: BreathingExerciseProps) {
       
       <div className="flex-1 flex flex-col items-center justify-between p-3 sm:p-6 overflow-y-auto">
         <div className="w-full">
-          <h3 className="text-xl font-semibold mb-3 sm:mb-4 text-white text-center">Let's Breathe Together</h3>
+          <h3 className="text-xl font-semibold mb-3 sm:mb-4 text-white text-center">Let&apos;s Breathe Together</h3>
           
           {/* Responsive height container - shorter on small screens */}
           <div className="relative flex items-center justify-center mb-4 h-[200px] sm:h-[250px] md:h-[350px]">
