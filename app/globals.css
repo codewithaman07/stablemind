@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/* Chat message styling */
+/* Crisis alert styling */
+.crisis-alert {
+  line-height: 1.5;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  border-left: 4px solid #f43f5e;
+  background-color: rgba(254, 202, 202, 0.1);
+}
+
+.crisis-alert p {
+  margin-bottom: 0.75rem;
+}
+
+.crisis-alert b {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.helpline-container {
+  background-color: rgba(254, 202, 202, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  border-left: 4px solid #f43f5e;
+}
+.chat-message b {
+  font-weight: 600;
+}
+
+.chat-message i {
+  font-style: italic;
+}
+
+.chat-message br {
+  margin-bottom: 0.5rem;
+}
+
+.chat-message p {
+  margin-bottom: 0.75rem;
+}
+
+.chat-message ul, .chat-message ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.chat-message ul {
+  list-style-type: disc;
+}
+
+.chat-message ol {
+  list-style-type: decimal;
+}
+
+.important-crisis-notice {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: rgba(254, 202, 202, 0.2);
+  border-left: 4px solid #f43f5e;
+  font-weight: 500;
+}
+
+.crisis-error-response {
+  background-color: rgba(254, 202, 202, 0.2);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid #f43f5e;
+}
+
+.crisis-error-response p {
+  margin-bottom: 0.75rem;
+}
+
+.crisis-error-response b {
+  color: #ffffff;
+  font-weight: 700;
+}
