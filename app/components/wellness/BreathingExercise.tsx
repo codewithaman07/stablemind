@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface BreathingExerciseProps {
   onBack: () => void;
@@ -9,6 +9,14 @@ interface BreathingExerciseProps {
 export default function BreathingExercise({ onBack }: BreathingExerciseProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1000);
+  
+  // Calculate appropriate circle size based on screen width
+  const getBaseSize = useCallback(() => {
+    if (screenWidth < 360) return 140;
+    if (screenWidth < 480) return 160;
+    if (screenWidth < 768) return 180;
+    return 200;
+  }, [screenWidth]);
   
   // Calculate initial size based on screen width
   const getInitialSize = () => {
@@ -38,16 +46,7 @@ export default function BreathingExercise({ onBack }: BreathingExerciseProps) {
     handleResize(); // Initialize on first render
     
     return () => window.removeEventListener('resize', handleResize);
-  }, [isAnimating]);
-  
-  // Handle breathing animation
-  // Calculate appropriate circle size based on screen width
-  const getBaseSize = () => {
-    if (screenWidth < 360) return 140;
-    if (screenWidth < 480) return 160;
-    if (screenWidth < 768) return 180;
-    return 200;
-  };
+  }, [isAnimating, getBaseSize]);
 
   useEffect(() => {
     if (!isAnimating) return;
@@ -93,7 +92,7 @@ export default function BreathingExercise({ onBack }: BreathingExerciseProps) {
       clearInterval(growInterval);
       clearInterval(shrinkInterval);
     };
-  }, [isAnimating]);
+  }, [isAnimating, getBaseSize]);
     return (
     <div className="flex flex-col bg-gray-900 rounded-lg shadow-lg overflow-hidden h-full">
       <div className="p-3 bg-gray-800 text-white">

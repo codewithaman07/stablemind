@@ -3,13 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { chatWithGemini } from "../services/geminiService";
 import { retrieveRelevantContent } from "../services/ragService";
-import { FaArrowRight, FaFileUpload } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { FaArrowRight } from "react-icons/fa";
 import { detectCrisis, mentalHealthHelplines } from "../services/crisisDetection";
 import { useChatContext } from "../context/ChatContext";
 
 export default function Chat() {
-  const router = useRouter();
   const { messages, setMessages, clearChatHistory } = useChatContext();
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -100,14 +98,6 @@ export default function Chat() {
             >
               <span className="mr-1">✨</span>
               New Chat
-            </button>
-            
-            <button 
-              onClick={() => router.push('/documents')}
-              className="flex items-center gap-1 text-xs md:text-sm text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-1 transition-colors"
-            >
-              <FaFileUpload size={14} className="mr-1" />
-              My Documents
             </button>
           </div>
         </div>

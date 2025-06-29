@@ -1,7 +1,5 @@
 "use client";
 
-import { findRelevantCustomContent } from './documentService';
-
 // This is a simplified version. For production, you would use a vector DB like Pinecone or Supabase
 const placementResources = [
   {
@@ -50,9 +48,6 @@ export async function retrieveRelevantContent(query: string): Promise<string> {
   // Convert query to lowercase for case-insensitive matching
   const queryLower = query.toLowerCase();
   
-  // First, check for relevant content in user's custom documents
-  const customContent = findRelevantCustomContent(query);
-  
   // Simple keyword matching (in production, use embeddings and semantic search)
   const relevantResources = placementResources.filter(resource => {
     // Check if any tags match the query keywords
@@ -63,13 +58,8 @@ export async function retrieveRelevantContent(query: string): Promise<string> {
     return tagMatch || contentMatch;
   });
   
-  // Combine content from both sources
+  // Combine content from relevant resources
   let combinedContent = '';
-  
-  // Add custom document content if available
-  if (customContent) {
-    combinedContent += "## From your uploaded documents:\n" + customContent + "\n\n";
-  }
   
   // Add built-in resources if available
   if (relevantResources.length > 0) {

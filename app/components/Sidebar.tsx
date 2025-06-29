@@ -1,4 +1,4 @@
-import { FaComments, FaBook, FaUserFriends, FaRegSmile, FaRegLifeRing, FaHeart, FaTimes, FaFileUpload } from "react-icons/fa";
+import { FaComments, FaBook, FaUserFriends, FaRegSmile, FaRegLifeRing, FaHeart, FaTimes } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -57,9 +57,6 @@ export default function Sidebar({ isOpen, onClose, clearChat }: SidebarProps) {
           <FaHeart className="text-red-400" /> Wellness Tools
         </Link>        <Link href="/resources" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium">
           <FaRegLifeRing className="text-orange-400" /> Resources
-        </Link>
-        <Link href="/documents" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium">
-          <FaFileUpload className="text-purple-400" /> My Documents
         </Link>
       </nav>
       <div className="mt-auto pt-8">

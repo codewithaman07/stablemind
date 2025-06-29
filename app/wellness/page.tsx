@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import BreathingExercise from '../components/wellness/BreathingExercise';
 import JournalPrompt from '../components/wellness/JournalPrompt';
@@ -10,7 +10,7 @@ import { WellnessTool, wellnessTools } from '../components/wellness/WellnessTool
 import { calmingVideos } from '../components/wellness/CalmingVideos';
 import { ChatProvider } from '../context/ChatContext';
 
-export default function WellnessTools() {
+function WellnessToolsContent() {
   const searchParams = useSearchParams();
   const toolParam = searchParams.get('tool') as WellnessTool | null;
   const [activeTool, setActiveTool] = useState<WellnessTool>(null);
@@ -118,5 +118,13 @@ export default function WellnessTools() {
         </div>
       </DashboardLayout>
     </ChatProvider>
+  );
+}
+
+export default function WellnessTools() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <WellnessToolsContent />
+    </Suspense>
   );
 }
