@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 import { FaBrain, FaSignInAlt, FaUserPlus, FaBars, FaTimes } from 'react-icons/fa';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
+  const { isSignedIn, user } = useUser();
 
   return (
     <nav className="fixed w-full z-50 p-4 md:py-5 md:px-8 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-sm">
@@ -26,18 +28,34 @@ export default function Header() {
           </div>
           
           <div className="flex items-center space-x-3">
-            <button 
-              onClick={() => router.push('/login')} 
-              className="px-4 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center"
-            >
-              <FaSignInAlt className="mr-2" /> Log In
-            </button>
-            <button 
-              onClick={() => router.push('/signup')}
-              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center"
-            >
-              <FaUserPlus className="mr-2" /> Sign Up
-            </button>
+            {isSignedIn ? (
+              <>
+                <span className="text-sm text-gray-600 dark:text-gray-300 hidden sm:block">
+                  Welcome, {user?.firstName || 'User'}!
+                </span>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      userButtonBox: "w-8 h-8",
+                      userButtonTrigger: "w-8 h-8 rounded-full border-2 border-indigo-200 hover:border-indigo-300"
+                    }
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <SignInButton mode="modal">
+                  <button className="px-4 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center">
+                    <FaSignInAlt className="mr-2" /> Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center">
+                    <FaUserPlus className="mr-2" /> Sign Up
+                  </button>
+                </SignUpButton>
+              </>
+            )}
           </div>
         </div>
 
@@ -75,24 +93,40 @@ export default function Header() {
               About
             </a> */}
             <hr className="border-gray-200 dark:border-gray-700" />
-            <button 
-              onClick={() => {
-                router.push('/login');
-                setMenuOpen(false);
-              }} 
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200 flex items-center"
-            >
-              <FaSignInAlt className="mr-2" /> Log In
-            </button>
-            <button 
-              onClick={() => {
-                router.push('/signup');
-                setMenuOpen(false);
-              }}
-              className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg flex items-center"
-            >
-              <FaUserPlus className="mr-2" /> Sign Up
-            </button>
+            {isSignedIn ? (
+              <div className="flex items-center justify-between p-2">
+                <span className="text-gray-700 dark:text-gray-200">
+                  Welcome, {user?.firstName || 'User'}!
+                </span>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      userButtonBox: "w-8 h-8",
+                      userButtonTrigger: "w-8 h-8 rounded-full border-2 border-indigo-200 hover:border-indigo-300"
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <>
+                <SignInButton mode="modal">
+                  <button 
+                    onClick={() => setMenuOpen(false)}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200 flex items-center w-full"
+                  >
+                    <FaSignInAlt className="mr-2" /> Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button 
+                    onClick={() => setMenuOpen(false)}
+                    className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg flex items-center w-full"
+                  >
+                    <FaUserPlus className="mr-2" /> Sign Up
+                  </button>
+                </SignUpButton>
+              </>
+            )}
             <button 
               onClick={() => {
                 router.push('/dashboard');

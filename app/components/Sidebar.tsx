@@ -1,4 +1,5 @@
-import { FaComments, FaBook, FaUserFriends, FaRegSmile, FaRegLifeRing, FaHeart, FaTimes } from "react-icons/fa";
+import { FaComments, FaBook, FaUserFriends, FaRegSmile, FaRegLifeRing, FaHeart, FaTimes, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
+import { useUser, SignOutButton, SignInButton } from '@clerk/nextjs';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -6,10 +7,12 @@ interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   clearChat?: () => void;
+  isGuestMode?: boolean;
 }
 
-export default function Sidebar({ isOpen, onClose, clearChat }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, clearChat, isGuestMode }: SidebarProps) {
   const router = useRouter();
+  const { user, isSignedIn } = useUser();
   
   const handleNewChat = () => {
     if (clearChat) {
@@ -59,9 +62,35 @@ export default function Sidebar({ isOpen, onClose, clearChat }: SidebarProps) {
           <FaRegLifeRing className="text-orange-400" /> Resources
         </Link>
       </nav>
-      <div className="mt-auto pt-8">
-        <div className="text-xs text-gray-500">Logged in as</div>
-        <div className="font-semibold text-gray-200">Guest</div>
+      <div className="mt-auto pt-8 border-t border-gray-800">
+        <div className="text-xs text-gray-500 mb-1">
+          {isSignedIn ? 'Signed in as' : 'Not signed in'}
+        </div>
+        <div className="font-semibold text-gray-200 mb-3">
+          {isSignedIn 
+            ? (user?.firstName || user?.emailAddresses[0]?.emailAddress || 'User')
+            : isGuestMode 
+              ? 'Guest User' 
+              : 'Guest'
+          }
+        </div>
+        {isSignedIn ? (
+          <SignOutButton>
+            <button className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+              <FaSignOutAlt />
+              Sign Out
+            </button>
+          </SignOutButton>
+        ) : isGuestMode && (
+          <div className="space-y-2">
+            <SignInButton mode="modal">
+              <button className="flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
+                <FaSignInAlt />
+                Sign In for Full Access
+              </button>
+            </SignInButton>
+          </div>
+        )}
       </div>
     </aside>
   );

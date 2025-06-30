@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser, SignInButton, SignUpButton } from '@clerk/nextjs';
 import Header from "./components/Header";
 import FeatureCards from "./components/FeatureCards";
 import SupportSection from "./components/SupportSection";
@@ -9,6 +10,8 @@ import { FaChevronDown } from "react-icons/fa";
 import Link from "next/link";
 
 export default function Home() {
+  const { isSignedIn, user } = useUser();
+  
   const scrollToFeatures = () => {
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -37,14 +40,44 @@ export default function Home() {
               job offers. Let&apos;s work together to maintain your mental well-being.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/dashboard">
-                <span className="inline-block px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-xl cursor-pointer">
-                  Chat with me
-                </span>
-              </Link>
+              {isSignedIn ? (
+                <>
+                  <Link href="/dashboard">
+                    <span className="inline-block px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-xl cursor-pointer">
+                      Continue to Dashboard
+                    </span>
+                  </Link>
+                  <div className="px-8 py-4 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-full text-lg font-medium">
+                    Welcome back, {user?.firstName || 'User'}!
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col sm:flex-row gap-4 items-center">
+                    <div className="flex gap-4">
+                      <SignInButton mode="modal">
+                        <button className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full text-lg font-medium transition-all shadow-lg hover:shadow-xl">
+                          Sign In
+                        </button>
+                      </SignInButton>
+                      <SignUpButton mode="modal">
+                        <button className="px-8 py-4 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-full text-lg font-medium transition-all hover:bg-indigo-50 dark:hover:bg-gray-700">
+                          Get Started
+                        </button>
+                      </SignUpButton>
+                    </div>
+                    <div className="text-gray-400 dark:text-gray-500 text-sm">or</div>
+                    <Link href="/dashboard">
+                      <button className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-full text-base font-medium transition-all hover:bg-gray-200 dark:hover:bg-gray-600">
+                        Try as Guest
+                      </button>
+                    </Link>
+                  </div>
+                </>
+              )}
               <button 
                 onClick={scrollToFeatures}
-                className="px-8 py-4 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-full text-lg font-medium transition-all hover:bg-indigo-50 dark:hover:bg-gray-700"
+                className="px-8 py-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-full text-lg font-medium transition-all hover:bg-gray-200 dark:hover:bg-gray-600"
               >
                 Explore Features
               </button>

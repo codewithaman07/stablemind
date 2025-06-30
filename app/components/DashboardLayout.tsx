@@ -5,7 +5,13 @@ import Sidebar from "./Sidebar";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useChatContext } from "../context/ChatContext";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ 
+  children, 
+  isGuestMode = false 
+}: { 
+  children: React.ReactNode;
+  isGuestMode?: boolean;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { clearChatHistory } = useChatContext();
 
@@ -31,7 +37,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
         
       <div className={`${sidebarOpen ? 'fixed inset-0 z-10 bg-black bg-opacity-50' : 'hidden'} md:block md:static`}>
-        <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} clearChat={clearChatHistory} />
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onClose={toggleSidebar} 
+          clearChat={clearChatHistory}
+          isGuestMode={isGuestMode}
+        />
       </div>
       
       
