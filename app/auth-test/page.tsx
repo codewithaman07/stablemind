@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AuthStatus from '../components/AuthStatus';
 
 export default function AuthTestPage() {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-900 dark:to-indigo-900 py-12">

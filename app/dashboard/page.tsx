@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  useUser,
-  RedirectToSignIn,
-  SignInButton,
-  SignUpButton,
-} from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import DashboardLayout from "../components/DashboardLayout";
 import Chat from "../components/Chat";
 import ToolsPanel from "../components/tools/ToolsPanel";
@@ -14,7 +9,7 @@ import { FaTools } from "react-icons/fa";
 import { ChatProvider } from "../context/ChatContext";
 
 export default function DashboardPage() {
-  const { isSignedIn, isLoaded, user } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const [mobileToolsVisible, setMobileToolsVisible] = useState(false);
 
   if (!isLoaded) {
@@ -54,22 +49,16 @@ export default function DashboardPage() {
               } md:hidden`}
             >
               <div className="p-4">
-                <button
-                  onClick={() => setMobileToolsVisible(false)}
-                  className="mb-4 px-4 py-2 bg-gray-800 rounded-lg text-white flex items-center gap-2"
-                >
-                  Back to Chat
-                </button>
                 <ToolsPanel />
               </div>
             </div>
           </div>
+          
           <button
-            onClick={() => setMobileToolsVisible(true)}
-            className="fixed bottom-6 right-6 md:hidden z-20 w-14 h-14 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg"
-            aria-label="Open wellness tools"
+            onClick={() => setMobileToolsVisible(!mobileToolsVisible)}
+            className="fixed bottom-4 right-4 lg:hidden bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg z-40"
           >
-            <FaTools size={24} />
+            <FaTools size={20} />
           </button>
         </div>
       </DashboardLayout>

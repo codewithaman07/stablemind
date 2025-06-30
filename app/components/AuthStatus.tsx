@@ -3,7 +3,7 @@
 import { useUser, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 export default function AuthStatus() {
-  const { user, isSignedIn } = useUser();
+  const { user } = useUser();
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-200 dark:border-gray-700">
@@ -30,21 +30,25 @@ export default function AuthStatus() {
       <SignedIn>
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <UserButton />
+            <UserButton 
+              appearance={{
+                elements: {
+                  userButtonBox: "w-10 h-10",
+                  userButtonTrigger: "w-10 h-10 rounded-full border-2 border-indigo-200 hover:border-indigo-300"
+                }
+              }}
+            />
             <div>
               <p className="text-gray-900 dark:text-white font-medium">
-                Welcome, {user?.firstName || user?.emailAddresses[0]?.emailAddress || 'User'}!
+                Welcome, {user?.firstName || 'User'}!
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                You are successfully signed in.
+                {user?.primaryEmailAddress?.emailAddress}
               </p>
             </div>
           </div>
-          
-          <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded">
-            <p><strong>User ID:</strong> {user?.id}</p>
-            <p><strong>Email:</strong> {user?.emailAddresses[0]?.emailAddress}</p>
-            <p><strong>Created:</strong> {user?.createdAt?.toLocaleDateString()}</p>
+          <div className="text-sm text-green-600 dark:text-green-400">
+            ✓ You are signed in
           </div>
         </div>
       </SignedIn>
