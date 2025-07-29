@@ -67,14 +67,18 @@ Make it something that would truly motivate a student or young professional.`;
 
       const response = await chatWithGemini(prompt);
       
-      // Parse the response to extract quote and author
-      const quoteMatch = response.match(/Quote:\s*["']([^"']+)["']/);
-      const authorMatch = response.match(/Author:\s*([^\n\r<]+)/);
-      
-      if (quoteMatch && authorMatch) {
+      // More robust parsing without complex regex
+      const lines = response.split('\n');
+      const quoteLine = lines.find(line => line.startsWith('Quote:'));
+      const authorLine = lines.find(line => line.startsWith('Author:'));
+
+      if (quoteLine && authorLine) {
+        const quoteText = quoteLine.replace(/^Quote:\s*["']/, '').replace(/["']$/, '').trim();
+        const authorText = authorLine.replace(/^Author:\s*/, '').trim();
+
         const quote: Quote = {
-          quote: quoteMatch[1].trim().replace(/<[^>]*>/g, ''), // Remove HTML tags
-          author: authorMatch[1].trim().replace(/<[^>]*>/g, ''), // Remove HTML tags
+          quote: quoteText.replace(/<[^>]*>/g, ''),
+          author: authorText.replace(/<[^>]*>/g, ''),
           category: "inspirational"
         };
         
@@ -112,27 +116,28 @@ Make them relevant to ${category} and perfect for someone facing career challeng
 
       const response = await chatWithGemini(prompt);
       
-      // Parse the response to extract quotes
-      const quoteMatches = response.match(/Quote \d+:\s*["']([^"']+)["']\s*-\s*([^\n\r<]+)/g);
-      
-      if (quoteMatches && quoteMatches.length > 0) {
-        const parsedQuotes: Quote[] = quoteMatches.map(match => {
-          const parts = match.match(/Quote \d+:\s*["']([^"']+)["']\s*-\s*([^\n\r<]+)/);
-          if (parts) {
+      // More robust parsing by splitting lines instead of a single large regex
+      const parsedQuotes: Quote[] = response
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.startsWith('Quote'))
+        .map(line => {
+          const match = line.match(/^Quote \d+:\s*"([^"]+)"\s*-\s*(.+)$/);
+          if (match) {
             return {
-              quote: parts[1].trim().replace(/<[^>]*>/g, ''), // Remove HTML tags
-              author: parts[2].trim().replace(/<[^>]*>/g, ''), // Remove HTML tags
+              quote: match[1].trim().replace(/<[^>]*>/g, ''),
+              author: match[2].trim().replace(/<[^>]*>/g, ''),
               category: category
             };
           }
           return null;
-        }).filter(Boolean) as Quote[];
-        
-        if (parsedQuotes.length > 0) {
-          setQuotes(parsedQuotes.slice(0, 2)); // Show first 2 for sidebar
-          setIsLoading(false);
-          return;
-        }
+        })
+        .filter(Boolean) as Quote[];
+
+      if (parsedQuotes.length > 0) {
+        setQuotes(parsedQuotes.slice(0, 2)); // Show first 2 for sidebar
+        setIsLoading(false);
+        return;
       }
     } catch (error) {
       console.error('Error fetching quotes from Gemini:', error);
@@ -232,8 +237,9 @@ Make them relevant to ${category} and perfect for someone facing career challeng
                   key={index}
                   className="bg-gray-800 rounded-md p-3 border border-gray-700"
                 >
+                  {/* ✅ FIX: Removed the length check and substring to show the full quote */}
                   <blockquote className="text-gray-200 text-xs mb-1 italic">
-                    &ldquo;{quote.quote.length > 100 ? quote.quote.substring(0, 100) + '...' : quote.quote}&rdquo;
+                    &ldquo;{quote.quote}&rdquo;
                   </blockquote>
                   <p className="text-gray-400 text-xs text-right">— {quote.author}</p>
                 </div>
