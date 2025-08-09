@@ -6,6 +6,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import BreathingExercise from '../components/wellness/BreathingExercise';
 import JournalPrompt from '../components/wellness/JournalPrompt';
 import DailyAffirmations from '../components/wellness/DailyAffirmations';
+import GroundingTechnique from '../components/wellness/GroundingTechnique';
 import { WellnessTool, wellnessTools } from '../components/wellness/WellnessToolsConfig';
 import { calmingVideos } from '../components/wellness/CalmingVideos';
 import { ChatProvider } from '../context/ChatContext';
@@ -67,18 +68,7 @@ function WellnessToolsContent() {
           </div>
         );
       case 'grounding':
-        return (
-          <div className="p-4 sm:p-8 text-center text-white bg-gray-900 rounded-lg">
-            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Grounding Technique</h3>
-            <p className="text-base sm:text-lg mb-6 sm:mb-8">Grounding techniques feature will be available soon.</p>
-            <button 
-              onClick={handleCloseTool}
-              className="w-full sm:w-auto px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium"
-            >
-              Back to Tools
-            </button>
-          </div>
-        );
+        return <GroundingTechnique onBack={handleCloseTool} />;
       case 'journal':
         return <JournalPrompt onBack={handleCloseTool} />;
       case 'affirmations':

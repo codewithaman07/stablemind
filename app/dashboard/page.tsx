@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import DashboardLayout from "../components/DashboardLayout";
 import Chat from "../components/Chat";
@@ -11,6 +11,22 @@ import { ChatProvider } from "../context/ChatContext";
 export default function DashboardPage() {
   const { isSignedIn, isLoaded } = useUser();
   const [mobileToolsVisible, setMobileToolsVisible] = useState(false);
+
+  // Listen for wellness tool requests and show mobile tools panel if needed
+  useEffect(() => {
+    const handleOpenWellnessTool = (event: CustomEvent) => {
+      // On mobile/tablet, show the tools panel when a wellness tool is requested
+      if (window.innerWidth < 1024) { // lg breakpoint
+        setMobileToolsVisible(true);
+      }
+    };
+
+    window.addEventListener('openWellnessTool', handleOpenWellnessTool as EventListener);
+    
+    return () => {
+      window.removeEventListener('openWellnessTool', handleOpenWellnessTool as EventListener);
+    };
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -48,8 +64,19 @@ export default function DashboardPage() {
                 mobileToolsVisible ? "block" : "hidden"
               } md:hidden`}
             >
-              <div className="p-4">
-                <ToolsPanel />
+              <div className="flex flex-col h-full">
+                <div className="flex items-center justify-between p-4 bg-gray-800">
+                  <h2 className="text-white font-semibold">Wellness Tools</h2>
+                  <button
+                    onClick={() => setMobileToolsVisible(false)}
+                    className="text-white hover:text-gray-300 text-xl font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="flex-1 p-4 overflow-hidden">
+                  <ToolsPanel />
+                </div>
               </div>
             </div>
           </div>

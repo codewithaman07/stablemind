@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // import { FaTools } from 'react-icons/fa';
 import BreathingExercise from "../wellness/BreathingExercise";
 import JournalPrompt from "../wellness/JournalPrompt";
 import DailyAffirmations from "../wellness/DailyAffirmations";
+import GroundingTechnique from "../wellness/GroundingTechnique";
 import { WellnessTool, wellnessTools } from "../wellness/WellnessToolsConfig";
 import { calmingVideos } from "../wellness/CalmingVideos";
 
@@ -14,6 +15,20 @@ export default function ToolsPanel() {
   const handleCloseTool = () => {
     setActiveTool(null);
   };
+
+  // Listen for wellness tool requests from the Chat component
+  useEffect(() => {
+    const handleOpenWellnessTool = (event: CustomEvent) => {
+      const { toolId } = event.detail;
+      setActiveTool(toolId as WellnessTool);
+    };
+
+    window.addEventListener('openWellnessTool', handleOpenWellnessTool as EventListener);
+    
+    return () => {
+      window.removeEventListener('openWellnessTool', handleOpenWellnessTool as EventListener);
+    };
+  }, []);
 
   // Render the correct tool component based on the selected tool
   const renderTool = () => {
@@ -63,23 +78,7 @@ export default function ToolsPanel() {
           </div>
         );
       case "grounding":
-        // Placeholder for grounding exercise
-        return (
-          <div className="p-3 md:p-4 text-center text-white">
-            <h3 className="text-lg font-semibold mb-3 md:mb-4">
-              Grounding Technique
-            </h3>
-            <p className="text-sm md:text-base">
-              Grounding techniques feature will be available soon.
-            </p>
-            <button
-              onClick={handleCloseTool}
-              className="mt-3 md:mt-4 px-3 md:px-4 py-1 md:py-2 bg-purple-500 text-white rounded-lg text-sm md:text-base"
-            >
-              Back
-            </button>
-          </div>
-        );
+        return <GroundingTechnique onBack={handleCloseTool} />;
       case "journal":
         return <JournalPrompt onBack={handleCloseTool} />;
       case "affirmations":

@@ -1,17 +1,24 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { DetectedEmotion } from '../services/emotionDetection';
+
+interface Message {
+  role: string;
+  content: string;
+  emotionSuggestions?: DetectedEmotion[];
+}
 
 interface ChatContextType {
   clearChatHistory: () => void;
-  messages: { role: string; content: string }[];
-  setMessages: React.Dispatch<React.SetStateAction<{ role: string; content: string }[]>>;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const [messages, setMessages] = useState<{role: string; content: string}[]>(() => {
+  const [messages, setMessages] = useState<Message[]>(() => {
     // Try to load messages from localStorage on component mount (client-side only)
     if (typeof window !== 'undefined') {
       const savedMessages = localStorage.getItem('stablemind_chat_history');
@@ -42,7 +49,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   // Function to clear chat history
   const clearChatHistory = () => {
     // Reset to initial message
-    const initialMessage = [{ 
+    const initialMessage: Message[] = [{ 
       role: "bot", 
       content: "Hi there! I'm StableMind, your placement companion. How can I help you today with your placement preparation or career concerns?" 
     }];
