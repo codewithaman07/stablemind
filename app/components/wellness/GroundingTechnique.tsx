@@ -158,7 +158,7 @@ export default function GroundingTechnique({ onBack }: GroundingTechniqueProps) 
               </div>
 
               <div className="text-center text-gray-400 text-sm">
-                Take your time. There's no rush. Focus on really noticing each thing.
+                Take your time. There&apos;s no rush. Focus on really noticing each thing.
               </div>
             </div>
             

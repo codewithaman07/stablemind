@@ -14,7 +14,7 @@ export default function DashboardPage() {
 
   // Listen for wellness tool requests and show mobile tools panel if needed
   useEffect(() => {
-    const handleOpenWellnessTool = (event: CustomEvent) => {
+    const handleOpenWellnessTool = () => {
       // On mobile/tablet, show the tools panel when a wellness tool is requested
       if (window.innerWidth < 1024) { // lg breakpoint
         setMobileToolsVisible(true);

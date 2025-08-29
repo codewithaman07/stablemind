@@ -68,10 +68,11 @@ export default function Chat() {
       const botResponse = await chatWithGemini(inputMessage, context, previousMessages);
       
       // 4. Add bot's response to chat with emotion suggestions if any
-      const botMessage: any = { role: "bot", content: botResponse };
-      if (detectedEmotions.length > 0) {
-        botMessage.emotionSuggestions = detectedEmotions;
-      }
+      const botMessage = { 
+        role: "bot", 
+        content: botResponse,
+        ...(detectedEmotions.length > 0 && { emotionSuggestions: detectedEmotions })
+      };
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error("Error in chat process:", error);
