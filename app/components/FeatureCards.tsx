@@ -4,77 +4,79 @@ import { useRouter } from 'next/navigation';
 
 export default function FeatureCards() {
   const router = useRouter();
-  
+
   const features = [
     {
       icon: "🎯",
       title: "Daily Goals",
       description: "Set achievable goals and track your placement preparation progress",
-      color: "from-blue-500 to-indigo-600",
-      textColor: "text-blue-100",
       path: "/dashboard"
     },
     {
       icon: "💭",
       title: "Mindful Moments",
       description: "Practice guided meditation and stress-relief techniques during placement season",
-      color: "from-purple-500 to-indigo-600",
-      textColor: "text-purple-100",
       path: "/dashboard"
     },
     {
       icon: "🤝",
       title: "Peer Support",
       description: "Connect with others who understand the placement journey challenges",
-      color: "from-pink-500 to-rose-600",
-      textColor: "text-pink-100",
       path: "/dashboard"
     },
     {
       icon: "📚",
       title: "Affirmations",
       description: "Motivational quotes and articles to keep you inspired",
-      color: "from-emerald-500 to-teal-600",
-      textColor: "text-emerald-100",
       path: "/affirmations"
     },
     {
       icon: "📊",
       title: "Mood Tracker",
       description: "Monitor your mental wellbeing throughout your placement journey",
-      color: "from-amber-500 to-orange-600",
-      textColor: "text-amber-100",
       path: "/mood"
     },
     {
       icon: "📝",
       title: "Document Upload",
       description: "Upload resumes and materials for personalized placement advice",
-      color: "from-cyan-500 to-blue-600",
-      textColor: "text-cyan-100",
       path: "/dashboard"
     }
   ];
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 mt-12">
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16 mt-8">
       {features.map((feature, index) => (
-        <div 
-          key={index} 
-          className="group relative overflow-hidden rounded-2xl shadow-lg transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
+        <div
+          key={index}
+          className="group relative rounded-xl p-6 cursor-pointer transition-all duration-300"
+          style={{
+            background: 'var(--bg-tertiary)',
+            border: '1px solid var(--border-primary)',
+          }}
           onClick={() => router.push(feature.path)}
+          onMouseEnter={e => {
+            e.currentTarget.style.borderColor = 'var(--accent-primary)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.borderColor = 'var(--border-primary)';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         >
-          <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-90`}></div>
-          <div className="relative p-8">
-            <div className="mb-4 inline-block rounded-full bg-white/20 p-3">
-              <span className="text-3xl">{feature.icon}</span>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">
-              {feature.title}
-            </h3>
-            <p className={`${feature.textColor} text-sm`}>
-              {feature.description}
-            </p>
+          <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-lg" style={{ background: 'var(--accent-surface)' }}>
+            <span className="text-2xl">{feature.icon}</span>
+          </div>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            {feature.title}
+          </h3>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            {feature.description}
+          </p>
+          <div className="mt-4 flex items-center gap-1 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--accent-primary)' }}>
+            Explore <span>→</span>
           </div>
         </div>
       ))}

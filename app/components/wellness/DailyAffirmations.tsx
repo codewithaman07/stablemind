@@ -14,25 +14,17 @@ interface Quote {
 }
 
 const affirmationCategories = [
-  { id: 'inspirational', name: 'Inspirational', icon: '🌟', color: 'bg-yellow-500' },
-  { id: 'motivational', name: 'Motivational', icon: '💪', color: 'bg-red-500' },
-  { id: 'success', name: 'Success', icon: '🏆', color: 'bg-green-500' },
-  { id: 'happiness', name: 'Happiness', icon: '😊', color: 'bg-pink-500' },
-  { id: 'wisdom', name: 'Wisdom', icon: '🧠', color: 'bg-purple-500' },
-  { id: 'confidence', name: 'Confidence', icon: '✨', color: 'bg-blue-500' }
+  { id: 'inspirational', name: 'Inspirational', icon: '🌟' },
+  { id: 'motivational', name: 'Motivational', icon: '💪' },
+  { id: 'success', name: 'Success', icon: '🏆' },
+  { id: 'happiness', name: 'Happiness', icon: '😊' },
+  { id: 'wisdom', name: 'Wisdom', icon: '🧠' },
+  { id: 'confidence', name: 'Confidence', icon: '✨' }
 ];
 
 const fallbackQuotes: Quote[] = [
-  {
-    quote: "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.",
-    author: "Christian D. Larson",
-    category: "confidence"
-  },
-  {
-    quote: "Your potential is endless. Go do what you were created to do.",
-    author: "Unknown",
-    category: "motivational"
-  }
+  { quote: "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.", author: "Christian D. Larson", category: "confidence" },
+  { quote: "Your potential is endless. Go do what you were created to do.", author: "Unknown", category: "motivational" }
 ];
 
 export default function DailyAffirmations({ onBack }: DailyAffirmationsProps) {
@@ -48,7 +40,7 @@ export default function DailyAffirmations({ onBack }: DailyAffirmationsProps) {
 
   const fetchQuoteOfTheDay = async () => {
     try {
-      const prompt = `Generate a single inspiring and motivational quote perfect for someone going through placement season or career challenges. The quote should be uplifting, practical, and encourage perseverance. 
+      const prompt = `Generate a single inspiring and motivational quote perfect for someone going through placement season or career challenges than should be uplifting, practical, and encourage perseverance.
 
 Please respond with ONLY the quote in this exact format:
 Quote: "[quote text]"
@@ -57,8 +49,6 @@ Author: [author name or "Unknown" if original]
 Make it something that would truly motivate a student or young professional.`;
 
       const response = await chatWithGemini(prompt);
-
-      // More robust parsing without complex regex
       const lines = response.split('\n');
       const quoteLine = lines.find(line => line.startsWith('Quote:'));
       const authorLine = lines.find(line => line.startsWith('Author:'));
@@ -67,20 +57,17 @@ Make it something that would truly motivate a student or young professional.`;
         const quoteText = quoteLine.replace(/^Quote:\s*["']/, '').replace(/["']$/, '').trim();
         const authorText = authorLine.replace(/^Author:\s*/, '').trim();
 
-        const quote: Quote = {
+        setQuoteOfTheDay({
           quote: quoteText.replace(/<[^>]*>/g, ''),
           author: authorText.replace(/<[^>]*>/g, ''),
           category: "inspirational"
-        };
-
-        setQuoteOfTheDay(quote);
+        });
         return;
       }
     } catch (error) {
       console.error('Error fetching quote from Gemini:', error);
     }
 
-    // Fallback to random quote from our small collection
     const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
     setQuoteOfTheDay(randomQuote);
   };
@@ -90,17 +77,16 @@ Make it something that would truly motivate a student or young professional.`;
     setError(null);
 
     try {
-      const prompt = `Generate 2 inspiring ${category} quotes that would motivate students during placement season. Each quote should be meaningful and uplifting.
+      const prompt = `Generate 2 inspiring ${category} quotes that would motivate students during placement season.
 
-Please respond with EXACTLY this format for each quote:
+Please respond with EXACTLY this format:
 Quote 1: "[quote text]" - [Author name or "Unknown"]
 Quote 2: "[quote text]" - [Author name or "Unknown"]
 
-Make them relevant to ${category} and perfect for someone facing career challenges.`;
+Make them relevant to ${category}.`;
 
       const response = await chatWithGemini(prompt);
 
-      // More robust parsing by splitting lines instead of a single large regex
       const parsedQuotes: Quote[] = response
         .split('\n')
         .map(line => line.trim())
@@ -119,7 +105,7 @@ Make them relevant to ${category} and perfect for someone facing career challeng
         .filter(Boolean) as Quote[];
 
       if (parsedQuotes.length > 0) {
-        setQuotes(parsedQuotes.slice(0, 2)); // Show first 2 for sidebar
+        setQuotes(parsedQuotes.slice(0, 2));
         setIsLoading(false);
         return;
       }
@@ -128,13 +114,8 @@ Make them relevant to ${category} and perfect for someone facing career challeng
       setError('Using offline quotes');
     }
 
-    // Fallback to our small collection
     const categoryQuotes = fallbackQuotes.filter(q => q.category === category);
-    if (categoryQuotes.length > 0) {
-      setQuotes(categoryQuotes.slice(0, 2));
-    } else {
-      setQuotes(fallbackQuotes.slice(0, 2));
-    }
+    setQuotes(categoryQuotes.length > 0 ? categoryQuotes.slice(0, 2) : fallbackQuotes.slice(0, 2));
     setIsLoading(false);
   };
 
@@ -143,45 +124,43 @@ Make them relevant to ${category} and perfect for someone facing career challeng
   }, [selectedCategory]);
 
   return (
-    <div className="flex flex-col bg-gray-900 rounded-lg shadow-lg overflow-hidden h-full">
-      <div className="p-3 bg-gray-800 text-white">
-        <h2 className="text-lg font-medium">Daily Affirmations</h2>
-        <p className="text-sm text-gray-400">Inspiration and positivity</p>
+    <div className="flex flex-col rounded-xl overflow-hidden h-full" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="p-3 border-b" style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}>
+        <h2 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Daily Affirmations</h2>
+        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Inspiration and positivity</p>
       </div>
 
       <div className="flex-1 p-3 overflow-y-auto">
         {/* Quote of the Day */}
         {quoteOfTheDay && (
-          <div className="bg-gradient-to-r from-purple-800 to-indigo-800 rounded-lg p-4 mb-4 border border-purple-600">
+          <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--accent-surface)', border: '1px solid var(--accent-border)' }}>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-lg">
-                ☀️
-              </div>
-              <h3 className="text-sm font-semibold text-white">Quote of the Day</h3>
+              <span className="text-sm">☀️</span>
+              <h3 className="text-xs font-semibold" style={{ color: 'var(--accent-primary)' }}>Quote of the Day</h3>
             </div>
-
-            <blockquote className="text-sm text-white mb-2 italic leading-relaxed">
+            <blockquote className="text-xs italic leading-relaxed mb-2" style={{ color: 'var(--text-primary)' }}>
               &ldquo;{quoteOfTheDay.quote}&rdquo;
             </blockquote>
-
-            <p className="text-purple-300 text-xs text-right">— {quoteOfTheDay.author}</p>
+            <p className="text-xs text-right" style={{ color: 'var(--text-tertiary)' }}>— {quoteOfTheDay.author}</p>
           </div>
         )}
 
-        {/* Category Selection */}
+        {/* Categories */}
         <div className="mb-4">
-          <h4 className="text-sm font-semibold text-white mb-2">Categories</h4>
-          <div className="grid grid-cols-2 gap-2">
+          <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Categories</h4>
+          <div className="grid grid-cols-2 gap-1.5">
             {affirmationCategories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`p-2 rounded-md transition-all text-xs ${selectedCategory === category.id
-                  ? `${category.color} text-white`
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  }`}
+                className="p-2 rounded-lg transition-all text-xs text-center"
+                style={{
+                  background: selectedCategory === category.id ? 'var(--accent-surface)' : 'var(--bg-tertiary)',
+                  border: `1px solid ${selectedCategory === category.id ? 'var(--accent-primary)' : 'var(--border-primary)'}`,
+                  color: selectedCategory === category.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                }}
               >
-                <div className="text-sm mb-1">{category.icon}</div>
+                <div className="text-sm mb-0.5">{category.icon}</div>
                 <div className="text-xs font-medium">{category.name}</div>
               </button>
             ))}
@@ -191,40 +170,37 @@ Make them relevant to ${category} and perfect for someone facing career challeng
         {/* Quotes */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-semibold text-white capitalize">
+            <h4 className="text-xs font-semibold capitalize" style={{ color: 'var(--text-primary)' }}>
               {selectedCategory}
             </h4>
             <button
               onClick={() => fetchQuotesByCategory(selectedCategory)}
               disabled={isLoading}
-              className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 text-white rounded text-xs transition-colors"
+              className="px-2 py-1 rounded-md text-xs transition-all"
+              style={{ background: 'var(--accent-surface)', color: 'var(--accent-primary)', border: '1px solid var(--accent-border)' }}
             >
               {isLoading ? '...' : 'New'}
             </button>
           </div>
 
           {error && (
-            <div className="bg-yellow-900 border border-yellow-700 text-yellow-300 p-2 rounded text-xs mb-2">
+            <div className="p-2 rounded-lg text-xs mb-2" style={{ background: 'var(--yellow-surface)', border: '1px solid rgba(245, 158, 11, 0.3)', color: 'var(--yellow-accent)' }}>
               {error}
             </div>
           )}
 
           {isLoading ? (
             <div className="text-center py-4">
-              <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-500"></div>
+              <div className="w-4 h-4 rounded-full mx-auto animate-spin" style={{ border: '2px solid var(--border-primary)', borderTopColor: 'var(--accent-primary)' }} />
             </div>
           ) : (
             <div className="space-y-2">
               {quotes.slice(0, 2).map((quote, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800 rounded-md p-3 border border-gray-700"
-                >
-                  {/* ✅ FIX: Removed the length check and substring to show the full quote */}
-                  <blockquote className="text-gray-200 text-xs mb-1 italic">
+                <div key={index} className="rounded-lg p-3" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+                  <blockquote className="text-xs italic mb-1" style={{ color: 'var(--text-primary)' }}>
                     &ldquo;{quote.quote}&rdquo;
                   </blockquote>
-                  <p className="text-gray-400 text-xs text-right">— {quote.author}</p>
+                  <p className="text-xs text-right" style={{ color: 'var(--text-muted)' }}>— {quote.author}</p>
                 </div>
               ))}
             </div>
@@ -234,13 +210,15 @@ Make them relevant to ${category} and perfect for someone facing career challeng
         <div className="flex gap-2">
           <button
             onClick={onBack}
-            className="flex-1 px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+            className="flex-1 px-3 py-2 rounded-lg text-sm transition-all"
+            style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border-primary)' }}
           >
             Back
           </button>
           <button
             onClick={() => window.open('/affirmations', '_blank')}
-            className="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors"
+            className="flex-1 px-3 py-2 rounded-lg text-sm font-medium text-white transition-all"
+            style={{ background: 'var(--accent-primary)' }}
           >
             Full Page
           </button>

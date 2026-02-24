@@ -1,71 +1,87 @@
 import Link from 'next/link';
-import { FaBrain, FaTwitter, FaInstagram, FaLinkedin, FaHeart } from 'react-icons/fa';
+import { FaTwitter, FaInstagram, FaLinkedin, FaHeart } from 'react-icons/fa';
+import Logo from './Logo';
 
 export default function Footer() {
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-16">
+    <footer className="py-16 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
-              <FaBrain className="text-xl text-indigo-600 dark:text-indigo-400" />
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white" style={{ background: 'var(--accent-primary)' }}>
+                <Logo size={15} />
+              </div>
+              <span className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
                 StableMind
               </span>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
               Your companion for navigating the challenges of placement season with confidence and mental wellness.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400">
-                <FaTwitter />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400">
-                <FaInstagram />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400">
-                <FaLinkedin />
-              </a>
+            <div className="flex gap-3">
+              {[FaTwitter, FaInstagram, FaLinkedin].map((Icon, i) => (
+                <a key={i} href="#" className="w-9 h-9 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-tertiary)' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-surface)'; e.currentTarget.style.color = 'var(--accent-primary)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-tertiary)'; }}>
+                  <Icon size={14} />
+                </a>
+              ))}
             </div>
           </div>
 
-          <div className="col-span-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Features</h3>
-            <ul className="space-y-3">
-              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">AI Chat Support</Link></li>
-              <li><Link href="/wellness" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Wellness Tools</Link></li>
-              <li><Link href="/mood" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Mood Tracker</Link></li>
-              <li><Link href="/affirmations" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Daily Affirmations</Link></li>
-            </ul>
-          </div>
-
-          <div className="col-span-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resources</h3>
-            <ul className="space-y-3">
-              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Placement Tips</Link></li>
-              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Interview Guides</Link></li>
-              <li><Link href="/wellness" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Wellness Resources</Link></li>
-              <li><Link href="/affirmations" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Affirmations</Link></li>
-            </ul>
-          </div>
-
-          <div className="col-span-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Get Help</h3>
-            <ul className="space-y-3">
-              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Chat Support</Link></li>
-              <li><Link href="/wellness" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Wellness Tools</Link></li>
-              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">FAQ</Link></li>
-              <li><Link href="/" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Privacy Policy</Link></li>
-            </ul>
-          </div>
+          {[
+            {
+              title: "Features",
+              links: [
+                { label: "AI Chat Support", href: "/dashboard" },
+                { label: "Wellness Tools", href: "/wellness" },
+                { label: "Mood Tracker", href: "/mood" },
+                { label: "Daily Affirmations", href: "/affirmations" },
+              ]
+            },
+            {
+              title: "Resources",
+              links: [
+                { label: "Placement Tips", href: "/dashboard" },
+                { label: "Interview Guides", href: "/dashboard" },
+                { label: "Wellness Resources", href: "/wellness" },
+                { label: "Affirmations", href: "/affirmations" },
+              ]
+            },
+            {
+              title: "Get Help",
+              links: [
+                { label: "Chat Support", href: "/dashboard" },
+                { label: "Wellness Tools", href: "/wellness" },
+                { label: "FAQ", href: "/dashboard" },
+                { label: "Privacy Policy", href: "/" },
+              ]
+            }
+          ].map((section, i) => (
+            <div key={i} className="col-span-1">
+              <h3 className="text-sm font-semibold mb-4 uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{section.title}</h3>
+              <ul className="space-y-3">
+                {section.links.map((link, j) => (
+                  <li key={j}>
+                    <Link href={link.href} className="text-sm transition-colors" style={{ color: 'var(--text-secondary)' }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <div className="border-t border-gray-200 dark:border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-500 dark:text-gray-400 mb-4 md:mb-0">
+        <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center" style={{ borderColor: 'var(--border-primary)' }}>
+          <p className="text-sm mb-4 md:mb-0" style={{ color: 'var(--text-muted)' }}>
             © {new Date().getFullYear()} StableMind. All rights reserved.
           </p>
-          <p className="flex items-center text-gray-500 dark:text-gray-400">
-            Made with <FaHeart className="text-red-500 mx-1" /> for students everywhere
+          <p className="flex items-center text-sm" style={{ color: 'var(--text-muted)' }}>
+            Made with <FaHeart className="mx-1" style={{ color: 'var(--red-accent)' }} size={12} /> for students everywhere
           </p>
         </div>
       </div>

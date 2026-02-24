@@ -1,23 +1,31 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowUp } from "react-icons/fa";
 import { detectCrisis, mentalHealthHelplines } from "../services/crisisDetection";
 import { DetectedEmotion } from "../services/emotionDetection";
 import { useChatContext } from "../context/ChatContext";
+import Logo from "./Logo";
 
 export default function Chat() {
-  const { messages, setMessages, clearChatHistory } = useChatContext();
+  const { messages, setMessages } = useChatContext();
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-scroll to bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle opening wellness tools
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
+    }
+  }, [inputMessage]);
+
   const handleOpenWellnessTool = (toolId: string | null) => {
     if (!toolId) return;
     const event = new CustomEvent('openWellnessTool', { detail: { toolId } });
@@ -32,7 +40,6 @@ export default function Chat() {
     setInputMessage("");
     setIsLoading(true);
 
-    // Check for crisis keywords immediately (client-side for instant feedback)
     const isCrisisMessage = detectCrisis(inputMessage);
 
     if (isCrisisMessage) {
@@ -94,69 +101,47 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] md:h-[calc(100vh-2rem)] bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden">
-      {/* Header */}
-      <div className="p-3 md:p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xl">
-              🔔
-            </div>
-            <div>
-              <h2 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">Stable Mind</h2>
-              <p className="text-xs md:text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
-                Ready to help you find calm
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={clearChatHistory}
-              className="flex items-center gap-1 text-xs md:text-sm text-white bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 rounded-full px-3 py-1 transition-colors"
-            >
-              <span className="mr-1">✨</span>
-              New Chat
-            </button>
-          </div>
-        </div>
-      </div>
-
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
       {/* Chat Messages */}
-      <div className="flex-1 p-3 md:p-4 overflow-y-auto bg-white dark:bg-gray-900">
-        <div className="max-w-2xl mx-auto">
+      <div className="flex-1 px-4 py-6 overflow-y-auto" style={{ background: 'var(--bg-primary)' }}>
+        <div className="max-w-2xl mx-auto space-y-6">
           {messages.map((message, index) => (
-            <div key={index}>
-              <div
-                className={`mb-6 ${message.role === "user" ? "flex justify-end" : "flex justify-start"
-                  }`}
-              >
+            <div key={index} className="animate-fade-in">
+              <div className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                {/* Bot/Alert avatar */}
                 {(message.role === "bot" || message.role === "alert") && (
-                  <div className="mr-3 flex-shrink-0">
-                    <div className={`w-9 h-9 ${message.role === "alert" ? "bg-red-500" : "bg-indigo-500"} rounded-full flex items-center justify-center text-white text-xl`}>
-                      {message.role === "alert" ? "⚠️" : "🔔"}
+                  <div className="mr-3 flex-shrink-0 mt-1">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white`}
+                      style={{ background: message.role === "alert" ? 'var(--red-accent)' : 'var(--accent-primary)' }}>
+                      {message.role === "alert" ? "⚠️" : <Logo size={18} />}
                     </div>
                   </div>
                 )}
 
                 <div
-                  className={`px-3 md:px-4 py-2 md:py-3 rounded-2xl max-w-[85%] ${message.role === "user"
-                      ? "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+                  className={`px-4 py-3 max-w-[85%] chat-message text-sm leading-relaxed ${message.role === "user"
+                    ? "rounded-2xl rounded-br-md"
+                    : "rounded-2xl rounded-bl-md"
+                    }`}
+                  style={
+                    message.role === "user"
+                      ? { background: 'var(--accent-primary)', color: '#fff' }
                       : message.role === "alert"
-                        ? "bg-red-500 text-white"
-                        : "bg-indigo-500 text-white"
-                    } chat-message`}
+                        ? { background: 'var(--red-surface)', color: 'var(--text-primary)', border: '1px solid rgba(239, 68, 68, 0.2)' }
+                        : { background: 'var(--bg-tertiary)', color: 'var(--text-primary)', border: '1px solid var(--border-primary)' }
+                  }
                 >
                   {message.role === "bot" || message.role === "alert" ? (
-                    <div dangerouslySetInnerHTML={{ __html: message.content }} className="prose dark:prose-invert max-w-none" />
+                    <div dangerouslySetInnerHTML={{ __html: message.content }} className="prose prose-invert max-w-none" />
                   ) : (
                     message.content
                   )}
                 </div>
 
+                {/* User avatar */}
                 {message.role === "user" && (
-                  <div className="ml-3 flex-shrink-0">
-                    <div className="w-9 h-9 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300">
+                  <div className="ml-3 flex-shrink-0 mt-1">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium" style={{ background: 'var(--bg-surface)', color: 'var(--text-secondary)', border: '1px solid var(--border-primary)' }}>
                       U
                     </div>
                   </div>
@@ -165,85 +150,105 @@ export default function Chat() {
 
               {/* Emotion-based wellness tool suggestions */}
               {message.role === "bot" && message.emotionSuggestions && message.emotionSuggestions.length > 0 && (
-                <div className="mb-6 flex justify-start">
+                <div className="mt-3 flex justify-start">
                   <div className="mr-3 flex-shrink-0">
-                    <div className="w-9 h-9 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: 'var(--accent-surface)', border: '1px solid var(--accent-border)' }}>
                       💡
                     </div>
                   </div>
-                  <div className="flex-1 bg-green-50 dark:bg-green-900/20 p-4 rounded-2xl border border-green-200 dark:border-green-800 max-w-[85%]">
-                    <h4 className="text-sm font-medium text-green-800 dark:text-green-200 mb-3">
-                      I think you should try this activity:
+                  <div className="flex-1 p-4 rounded-xl max-w-[85%]" style={{ background: 'var(--accent-surface)', border: '1px solid var(--accent-border)' }}>
+                    <h4 className="text-xs font-medium mb-3" style={{ color: 'var(--accent-primary)' }}>
+                      Suggested activity for you:
                     </h4>
                     <div className="space-y-2">
                       {message.emotionSuggestions.map((emotion: DetectedEmotion, idx: number) => (
                         <button
                           key={idx}
                           onClick={() => handleOpenWellnessTool(emotion.tool)}
-                          className="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg border border-green-200 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors group"
+                          className="w-full text-left p-3 rounded-lg transition-all group"
+                          style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-primary)'; }}
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className="font-medium text-green-700 dark:text-green-300 group-hover:text-green-800 dark:group-hover:text-green-200">
+                              <div className="font-medium text-sm" style={{ color: 'var(--accent-primary)' }}>
                                 {emotion.buttonText}
                               </div>
-                              <div className="text-sm text-green-600 dark:text-green-400 mt-1">
+                              <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                                 {emotion.description}
                               </div>
                             </div>
-                            <div className="text-green-500 group-hover:text-green-600 transition-colors">
-                              →
-                            </div>
+                            <span style={{ color: 'var(--accent-primary)' }}>→</span>
                           </div>
                         </button>
                       ))}
                     </div>
-                    <div className="mt-3 text-xs text-green-600 dark:text-green-400">
-                      These suggestions are based on what you&apos;ve shared. Feel free to explore what feels right for you.
+                    <div className="mt-3 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                      Suggestions based on what you&apos;ve shared.
                     </div>
                   </div>
                 </div>
               )}
             </div>
           ))}
-        </div>
 
-        {isLoading && (
-          <div className="text-left mb-4">
-            <div className="inline-block p-3 rounded-lg bg-purple-500 text-white">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="mr-3 flex-shrink-0 mt-1">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{ background: 'var(--accent-primary)' }}>
+                  <Logo size={18} />
+                </div>
+              </div>
+              <div className="px-4 py-3.5 rounded-2xl rounded-bl-md" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+                <div className="flex gap-1.5">
+                  <div className="typing-dot" />
+                  <div className="typing-dot" />
+                  <div className="typing-dot" />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {/* Input Area */}
-      <div className="p-3 md:p-4 bg-white dark:bg-gray-900">
+      <div className="px-4 py-3 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
         <div className="max-w-2xl mx-auto">
-          <div className="relative">
-            <input
-              type="text"
+          <div className="relative flex items-end rounded-xl overflow-hidden" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+            <textarea
+              ref={textareaRef}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-              className="w-full p-3 md:p-4 pl-4 md:pl-5 pr-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-gray-800 dark:text-white text-sm md:text-base"
-              placeholder="Share what's on your mind..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              className="flex-1 px-4 py-3 bg-transparent focus:outline-none resize-none text-sm leading-relaxed"
+              style={{ color: 'var(--text-primary)', minHeight: '44px', maxHeight: '200px' }}
+              placeholder="Message StableMind..."
+              rows={1}
             />
             <button
               onClick={handleSendMessage}
-              disabled={isLoading}
+              disabled={isLoading || !inputMessage.trim()}
               aria-label="Send message"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full flex items-center justify-center disabled:opacity-50 transition-colors"
+              className="m-1.5 w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-30"
+              style={{
+                background: inputMessage.trim() ? 'var(--accent-primary)' : 'var(--bg-hover)',
+                color: inputMessage.trim() ? '#fff' : 'var(--text-muted)'
+              }}
             >
-              <FaArrowRight size={16} />
+              <FaArrowUp size={14} />
             </button>
           </div>
+          <p className="text-center mt-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+            StableMind can make mistakes. Consider verifying important information.
+          </p>
         </div>
       </div>
     </div>

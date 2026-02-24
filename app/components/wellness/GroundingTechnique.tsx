@@ -42,7 +42,6 @@ export default function GroundingTechnique({ onBack }: GroundingTechniqueProps) 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Finished all steps
       setIsActive(false);
       setCurrentStep(0);
     }
@@ -59,134 +58,119 @@ export default function GroundingTechnique({ onBack }: GroundingTechniqueProps) 
   };
 
   return (
-    <div className="flex flex-col bg-gray-900 rounded-lg shadow-lg overflow-hidden h-full">
-      <div className="p-3 bg-gray-800 text-white">
-        <h2 className="text-lg font-medium">5-4-3-2-1 Grounding Technique</h2>
-        <p className="text-sm text-gray-400">Reconnect with the present moment</p>
+    <div className="flex flex-col rounded-xl overflow-hidden h-full" style={{ background: 'var(--bg-secondary)' }}>
+      <div className="p-3 border-b" style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border-primary)' }}>
+        <h2 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>5-4-3-2-1 Grounding Technique</h2>
+        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Reconnect with the present moment</p>
       </div>
-      
-      <div className="flex-1 flex flex-col p-3 sm:p-6 overflow-y-auto">
+
+      <div className="flex-1 flex flex-col p-4 sm:p-6 overflow-y-auto">
         {!isActive ? (
-          // Introduction screen
           <div className="flex-1 flex flex-col justify-between">
             <div>
-              <h3 className="text-xl font-semibold mb-4 text-white text-center">Find Your Ground</h3>
-              
-              <div className="bg-gray-800 rounded-lg p-4 mb-6">
-                <p className="text-gray-300 text-sm sm:text-base mb-4">
-                  The 5-4-3-2-1 technique helps you reconnect with the present moment by engaging all your senses. 
+              <h3 className="text-lg font-semibold mb-4 text-center" style={{ color: 'var(--text-primary)' }}>Find Your Ground</h3>
+
+              <div className="rounded-xl p-4 mb-6" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+                <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+                  The 5-4-3-2-1 technique helps you reconnect with the present moment by engaging all your senses.
                   This is especially helpful when feeling anxious, overwhelmed, or disconnected.
                 </p>
-                
+
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-3 text-blue-300">
-                    <span className="w-6 h-6 bg-blue-900 rounded-full flex items-center justify-center text-xs font-bold">5</span>
-                    <span>Things you can see</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-green-300">
-                    <span className="w-6 h-6 bg-green-900 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                    <span>Things you can touch</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-yellow-300">
-                    <span className="w-6 h-6 bg-yellow-900 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                    <span>Things you can hear</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-purple-300">
-                    <span className="w-6 h-6 bg-purple-900 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                    <span>Things you can smell</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-pink-300">
-                    <span className="w-6 h-6 bg-pink-900 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                    <span>Thing you can taste</span>
-                  </div>
+                  {[
+                    { num: 5, label: 'Things you can see', color: 'var(--accent-primary)' },
+                    { num: 4, label: 'Things you can touch', color: '#22c55e' },
+                    { num: 3, label: 'Things you can hear', color: '#eab308' },
+                    { num: 2, label: 'Things you can smell', color: '#a855f7' },
+                    { num: 1, label: 'Thing you can taste', color: '#ec4899' },
+                  ].map((item) => (
+                    <div key={item.num} className="flex items-center gap-3" style={{ color: item.color }}>
+                      <span className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold" style={{ background: `${item.color}20`, color: item.color }}>{item.num}</span>
+                      <span>{item.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-            
-            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
-              <button 
+
+            <div className="flex flex-col sm:flex-row justify-center gap-2">
+              <button
                 onClick={handleStart}
-                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-sm sm:text-base"
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-all"
+                style={{ background: 'var(--accent-primary)' }}
               >
                 Start Grounding
               </button>
-              <button 
+              <button
                 onClick={onBack}
-                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium text-sm sm:text-base"
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border-primary)' }}
               >
                 Back
               </button>
             </div>
           </div>
         ) : (
-          // Active grounding session
           <div className="flex-1 flex flex-col justify-between">
             <div>
-              {/* Progress indicator */}
+              {/* Progress */}
               <div className="flex justify-center mb-6">
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   {steps.map((_, index) => (
                     <div
                       key={index}
-                      className={`w-3 h-3 rounded-full transition-colors ${
-                        index <= currentStep ? 'bg-indigo-500' : 'bg-gray-600'
-                      }`}
+                      className="w-2.5 h-2.5 rounded-full transition-colors"
+                      style={{ background: index <= currentStep ? 'var(--accent-primary)' : 'var(--border-primary)' }}
                     />
                   ))}
                 </div>
               </div>
 
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">
+                <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
                   {steps[currentStep].title}
                 </h3>
-                <p className="text-gray-300 text-base sm:text-lg">
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {steps[currentStep].instruction}
                 </p>
               </div>
 
-              <div className="bg-gray-800 rounded-lg p-4 mb-6">
-                <h4 className="text-white font-medium mb-3">Examples:</h4>
+              <div className="rounded-xl p-4 mb-6" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Examples:</h4>
                 <ul className="space-y-2">
                   {steps[currentStep].examples.map((example, index) => (
-                    <li key={index} className="text-gray-300 text-sm flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span>
+                    <li key={index} className="text-sm flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent-primary)' }} />
                       {example}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="text-center text-gray-400 text-sm">
+              <p className="text-center text-xs" style={{ color: 'var(--text-muted)' }}>
                 Take your time. There&apos;s no rush. Focus on really noticing each thing.
-              </div>
+              </p>
             </div>
-            
-            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 mt-6">
-              {currentStep < steps.length - 1 ? (
-                <button 
-                  onClick={handleNext}
-                  className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-sm sm:text-base"
-                >
-                  Next Step
-                </button>
-              ) : (
-                <button 
-                  onClick={handleNext}
-                  className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium text-sm sm:text-base"
-                >
-                  Complete
-                </button>
-              )}
-              <button 
+
+            <div className="flex flex-col sm:flex-row justify-center gap-2 mt-6">
+              <button
+                onClick={handleNext}
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-all"
+                style={{ background: currentStep < steps.length - 1 ? 'var(--accent-primary)' : '#22c55e' }}
+              >
+                {currentStep < steps.length - 1 ? 'Next Step' : 'Complete'}
+              </button>
+              <button
                 onClick={handleReset}
-                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium text-sm sm:text-base"
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)' }}
               >
                 Reset
               </button>
-              <button 
+              <button
                 onClick={onBack}
-                className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors font-medium text-sm sm:text-base"
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border-primary)' }}
               >
                 Back
               </button>

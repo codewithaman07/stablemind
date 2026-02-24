@@ -1,44 +1,45 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { FaComment, FaHeartbeat, FaArrowRight } from "react-icons/fa";
+import { FaComment, FaArrowRight } from "react-icons/fa";
 
 export default function SupportSection() {
   const router = useRouter();
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-indigo-700 p-10 rounded-3xl shadow-xl mt-12 mb-20">
-      <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-purple-500 rounded-full opacity-20"></div>
-      <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-48 h-48 bg-indigo-500 rounded-full opacity-20"></div>
-      
-      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
-        <div className="md:w-2/3 mb-6 md:mb-0 md:pr-10">
-          <div className="flex items-center mb-3">
-            <FaHeartbeat className="text-pink-300 mr-3 text-xl" />
-            <span className="text-pink-200 uppercase tracking-wider text-sm font-medium">Placement Support</span>
+    <div className="relative overflow-hidden rounded-2xl mt-8 mb-20 p-8 md:p-12" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+      {/* Subtle background accent glow */}
+      <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-[0.06]" style={{ background: 'var(--accent-primary)', filter: 'blur(80px)' }} />
+
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="md:w-2/3">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-primary)' }} />
+            <span className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--accent-primary)' }}>Placement Support</span>
           </div>
-          <h3 className="text-3xl md:text-4xl font-bold mb-4 text-white leading-tight">
+          <h3 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
             Need Someone to Talk To?
           </h3>
-          <p className="text-indigo-100 mb-6 text-lg">
+          <p className="mb-6 text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             Our trained AI is here to listen and support you 24/7. Your
             mental health matters more than any job placement. Share your concerns in a safe space.
           </p>
           <button
-            className="flex items-center px-8 py-4 bg-white text-indigo-700 rounded-full hover:bg-indigo-50 transition-colors font-medium shadow-lg group"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-medium text-white transition-all group"
+            style={{ background: 'var(--accent-primary)' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--accent-primary)'}
             onClick={() => router.push("/dashboard")}
           >
-            <FaComment className="mr-2" />
-            Chat with me 
-            <FaArrowRight className="ml-2 opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all" />
+            <FaComment size={14} />
+            Chat with me
+            <FaArrowRight size={12} className="opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1" />
           </button>
         </div>
-        
+
         <div className="md:w-1/3 flex justify-center">
-          <div className="w-40 h-40 rounded-full bg-white/20 flex items-center justify-center">
-            <div className="w-32 h-32 rounded-full bg-white/30 flex items-center justify-center">
-              <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center text-5xl text-indigo-600">
-                💬
-              </div>
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full flex items-center justify-center" style={{ background: 'var(--accent-surface)', border: '2px solid var(--accent-border)' }}>
+            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center" style={{ background: 'var(--bg-surface)' }}>
+              <span className="text-5xl">💬</span>
             </div>
           </div>
         </div>
