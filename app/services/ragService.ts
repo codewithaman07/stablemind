@@ -1,5 +1,3 @@
-"use client";
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import vectorDB from './vector_database.json';
 
@@ -14,19 +12,19 @@ class RAGService {
   private vectorDocuments: VectorDocument[];
 
   constructor() {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+    const apiKey = process.env.GEMINI_API_KEY || '';
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.vectorDocuments = vectorDB as VectorDocument[];
   }
 
-// using cosine similarity  
+  // using cosine similarity  
   private cosineSimilarity(vecA: number[], vecB: number[]): number {
     if (!vecA.length || !vecB.length || vecA.length !== vecB.length) return 0;
-    
+
     const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
     const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
     const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-    
+
     if (magnitudeA === 0 || magnitudeB === 0) return 0;
     return dotProduct / (magnitudeA * magnitudeB);
   }
@@ -34,7 +32,7 @@ class RAGService {
   private generateEmbedding(text: string): number[] {
     const words = text.toLowerCase().split(/\s+/);
     const embedding = new Array(384).fill(0);
-    
+
     words.forEach((word, index) => {
       for (let i = 0; i < word.length; i++) {
         const charCode = word.charCodeAt(i);
@@ -42,14 +40,14 @@ class RAGService {
         embedding[position] += charCode / 1000;
       }
     });
-    
+
     const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
     return magnitude > 0 ? embedding.map(val => val / magnitude) : embedding;
   }
 
   private retrieveRelevantDocs(query: string, topK: number = 3): VectorDocument[] {
     const queryEmbedding = this.generateEmbedding(query);
-    
+
     const scoredDocs = this.vectorDocuments
       .filter(doc => doc.embedding && doc.embedding.length > 0)
       .map(doc => ({
@@ -66,7 +64,7 @@ class RAGService {
   async query(userQuery: string, conversationHistory: Array<{ role: string; content: string }> = []): Promise<string> {
     try {
       const relevantDocs = this.retrieveRelevantDocs(userQuery, 3);
-      
+
       const context = relevantDocs
         .map((doc, idx) => `[Context ${idx + 1}]\n${doc.content}`)
         .join('\n\n');
@@ -105,7 +103,7 @@ Please respond to the user's question with compassion and helpful information.`;
 
   searchByKeyword(keyword: string): VectorDocument[] {
     const lowerKeyword = keyword.toLowerCase();
-    return this.vectorDocuments.filter(doc => 
+    return this.vectorDocuments.filter(doc =>
       doc.content.toLowerCase().includes(lowerKeyword)
     );
   }
@@ -122,11 +120,11 @@ Please respond to the user's question with compassion and helpful information.`;
   // Retrieve relevant content as string (for integration with other services)
   retrieveRelevantContent(query: string, topK: number = 3): string {
     const relevantDocs = this.retrieveRelevantDocs(query, topK);
-    
+
     if (relevantDocs.length === 0) {
       return "No specific context found in knowledge base.";
     }
-    
+
     return relevantDocs
       .map((doc, idx) => `[Context ${idx + 1}]\n${doc.content}`)
       .join('\n\n');
@@ -135,6 +133,6 @@ Please respond to the user's question with compassion and helpful information.`;
 
 export const ragService = new RAGService();
 
-export async function retrieveRelevantContent(query: string): Promise<string> {
+export function retrieveRelevantContent(query: string): string {
   return ragService.retrieveRelevantContent(query);
 }

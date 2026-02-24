@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 interface MoodEntry {
   date: string;
-  mood: number; 
+  mood: number;
   moodLabel: string;
   note: string;
   color: string;
@@ -57,11 +57,6 @@ export default function MoodTracker() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('moodHistory');
-    if (saved) {
-      setMoodHistory(JSON.parse(saved));
-    }
-    
     const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
     setCurrentQuote(randomQuote);
   }, []);
@@ -83,12 +78,12 @@ export default function MoodTracker() {
 
     const updatedHistory = [newEntry, ...moodHistory.slice(0, 6)];
     setMoodHistory(updatedHistory);
-    localStorage.setItem('moodHistory', JSON.stringify(updatedHistory));
+
 
     setSelectedMood(null);
     setNote('');
     setShowSuccess(true);
-    
+
     setTimeout(() => setShowSuccess(false), 3000);
 
     const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
@@ -97,10 +92,10 @@ export default function MoodTracker() {
 
   const getMoodTrend = () => {
     if (moodHistory.length < 2) return null;
-    
+
     const recent = moodHistory.slice(0, 3);
     const average = recent.reduce((sum, entry) => sum + entry.mood, 0) / recent.length;
-    
+
     if (average >= 4) return { trend: 'great', message: 'You\'re doing great!', color: 'text-green-400' };
     if (average >= 3) return { trend: 'good', message: 'Things are looking up!', color: 'text-yellow-400' };
     return { trend: 'needs-attention', message: 'Take care of yourself', color: 'text-orange-400' };
@@ -144,11 +139,10 @@ export default function MoodTracker() {
                 <button
                   key={mood.value}
                   onClick={() => setSelectedMood(mood.value)}
-                  className={`p-4 sm:p-6 rounded-xl transition-all transform hover:scale-105 ${
-                    selectedMood === mood.value
-                      ? `${mood.color} text-white scale-105 shadow-lg`
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
+                  className={`p-4 sm:p-6 rounded-xl transition-all transform hover:scale-105 ${selectedMood === mood.value
+                    ? `${mood.color} text-white scale-105 shadow-lg`
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
                 >
                   <div className="text-3xl sm:text-4xl mb-2">{mood.emoji}</div>
                   <div className="text-sm sm:text-base font-medium">{mood.label}</div>

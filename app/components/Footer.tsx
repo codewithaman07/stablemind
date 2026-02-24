@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { FaBrain, FaTwitter, FaInstagram, FaLinkedin, FaHeart } from 'react-icons/fa';
 
 export default function Footer() {
@@ -27,38 +28,38 @@ export default function Footer() {
               </a>
             </div>
           </div>
-          
+
           <div className="col-span-1">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Features</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Daily Goals</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Mindful Moments</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Peer Support</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Mood Tracking</a></li>
+              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">AI Chat Support</Link></li>
+              <li><Link href="/wellness" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Wellness Tools</Link></li>
+              <li><Link href="/mood" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Mood Tracker</Link></li>
+              <li><Link href="/affirmations" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Daily Affirmations</Link></li>
             </ul>
           </div>
-          
+
           <div className="col-span-1">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resources</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Placement Tips</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Resume Templates</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Interview Guides</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Wellness Resources</a></li>
+              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Placement Tips</Link></li>
+              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Interview Guides</Link></li>
+              <li><Link href="/wellness" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Wellness Resources</Link></li>
+              <li><Link href="/affirmations" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Affirmations</Link></li>
             </ul>
           </div>
-          
+
           <div className="col-span-1">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Get Help</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Emergency Support</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Contact Us</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">FAQ</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Privacy Policy</a></li>
+              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Chat Support</Link></li>
+              <li><Link href="/wellness" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Wellness Tools</Link></li>
+              <li><Link href="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">FAQ</Link></li>
+              <li><Link href="/" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Privacy Policy</Link></li>
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t border-gray-200 dark:border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 dark:text-gray-400 mb-4 md:mb-0">
             © {new Date().getFullYear()} StableMind. All rights reserved.

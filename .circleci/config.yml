@@ -1,0 +1,39 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@7.1.0
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/node:20.18
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run ESLint
+          command: npm run lint
+
+  build:
+    docker:
+      - image: cimg/node:20.18
+    resource_class: medium+
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build Next.js app
+          command: npm run build
+      - store_artifacts:
+          path: .next
+          destination: build
+
+workflows:
+  ci:
+    jobs:
+      - lint
+      - build:
+          requires:
+            - lint

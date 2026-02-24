@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useUser, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 import { FaBrain, FaSignInAlt, FaUserPlus, FaBars, FaTimes } from 'react-icons/fa';
 
@@ -19,21 +20,20 @@ export default function Header() {
             StableMind
           </h1>
         </div>
-        
+
         <div className="hidden md:flex items-center space-x-8">
           <div className="space-x-6">
-            <a href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Features</a>
-            <a href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Resources</a>
-            {/* <a href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">About</a> */}
+            <Link href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Features</Link>
+            <Link href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Resources</Link>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             {isSignedIn ? (
               <>
                 <span className="text-sm text-gray-600 dark:text-gray-300 hidden sm:block">
                   Welcome, {user?.firstName || 'User'}!
                 </span>
-                <UserButton 
+                <UserButton
                   appearance={{
                     elements: {
                       userButtonBox: "w-8 h-8",
@@ -59,46 +59,39 @@ export default function Header() {
           </div>
         </div>
 
-        <button 
+        <button
           className="md:hidden text-gray-500 dark:text-gray-400 focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>
       </div>
-      
+
 
       {menuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-b-lg p-4 md:hidden">
           <div className="flex flex-col space-y-3">
-            <a 
-              href="/dashboard" 
+            <Link
+              href="/dashboard"
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200"
               onClick={() => setMenuOpen(false)}
             >
               Features
-            </a>
-            <a 
-              href="/dashboard" 
+            </Link>
+            <Link
+              href="/dashboard"
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200"
               onClick={() => setMenuOpen(false)}
             >
               Resources
-            </a>
-            {/* <a 
-              href="/dashboard" 
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200"
-              onClick={() => setMenuOpen(false)}
-            >
-              About
-            </a> */}
+            </Link>
             <hr className="border-gray-200 dark:border-gray-700" />
             {isSignedIn ? (
               <div className="flex items-center justify-between p-2">
                 <span className="text-gray-700 dark:text-gray-200">
                   Welcome, {user?.firstName || 'User'}!
                 </span>
-                <UserButton 
+                <UserButton
                   appearance={{
                     elements: {
                       userButtonBox: "w-8 h-8",
@@ -110,7 +103,7 @@ export default function Header() {
             ) : (
               <>
                 <SignInButton mode="modal">
-                  <button 
+                  <button
                     onClick={() => setMenuOpen(false)}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200 flex items-center w-full"
                   >
@@ -118,7 +111,7 @@ export default function Header() {
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button 
+                  <button
                     onClick={() => setMenuOpen(false)}
                     className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg flex items-center w-full"
                   >
@@ -127,7 +120,7 @@ export default function Header() {
                 </SignUpButton>
               </>
             )}
-            <button 
+            <button
               onClick={() => {
                 router.push('/dashboard');
                 setMenuOpen(false);

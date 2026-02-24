@@ -42,17 +42,8 @@ export default function DailyAffirmations({ onBack }: DailyAffirmationsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get quote of the day (cached per day)
   useEffect(() => {
-    const today = new Date().toDateString();
-    const cachedQuote = localStorage.getItem('quoteOfTheDay');
-    const cachedDate = localStorage.getItem('quoteOfTheDayDate');
-
-    if (cachedQuote && cachedDate === today) {
-      setQuoteOfTheDay(JSON.parse(cachedQuote));
-    } else {
-      fetchQuoteOfTheDay();
-    }
+    fetchQuoteOfTheDay();
   }, []);
 
   const fetchQuoteOfTheDay = async () => {
@@ -66,7 +57,7 @@ Author: [author name or "Unknown" if original]
 Make it something that would truly motivate a student or young professional.`;
 
       const response = await chatWithGemini(prompt);
-      
+
       // More robust parsing without complex regex
       const lines = response.split('\n');
       const quoteLine = lines.find(line => line.startsWith('Quote:'));
@@ -81,30 +72,23 @@ Make it something that would truly motivate a student or young professional.`;
           author: authorText.replace(/<[^>]*>/g, ''),
           category: "inspirational"
         };
-        
-        const today = new Date().toDateString();
+
         setQuoteOfTheDay(quote);
-        localStorage.setItem('quoteOfTheDay', JSON.stringify(quote));
-        localStorage.setItem('quoteOfTheDayDate', today);
         return;
       }
     } catch (error) {
       console.error('Error fetching quote from Gemini:', error);
     }
-    
+
     // Fallback to random quote from our small collection
     const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
-    const today = new Date().toDateString();
-    
     setQuoteOfTheDay(randomQuote);
-    localStorage.setItem('quoteOfTheDay', JSON.stringify(randomQuote));
-    localStorage.setItem('quoteOfTheDayDate', today);
   };
 
   const fetchQuotesByCategory = async (category: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const prompt = `Generate 2 inspiring ${category} quotes that would motivate students during placement season. Each quote should be meaningful and uplifting.
 
@@ -115,7 +99,7 @@ Quote 2: "[quote text]" - [Author name or "Unknown"]
 Make them relevant to ${category} and perfect for someone facing career challenges.`;
 
       const response = await chatWithGemini(prompt);
-      
+
       // More robust parsing by splitting lines instead of a single large regex
       const parsedQuotes: Quote[] = response
         .split('\n')
@@ -143,7 +127,7 @@ Make them relevant to ${category} and perfect for someone facing career challeng
       console.error('Error fetching quotes from Gemini:', error);
       setError('Using offline quotes');
     }
-    
+
     // Fallback to our small collection
     const categoryQuotes = fallbackQuotes.filter(q => q.category === category);
     if (categoryQuotes.length > 0) {
@@ -175,11 +159,11 @@ Make them relevant to ${category} and perfect for someone facing career challeng
               </div>
               <h3 className="text-sm font-semibold text-white">Quote of the Day</h3>
             </div>
-            
+
             <blockquote className="text-sm text-white mb-2 italic leading-relaxed">
               &ldquo;{quoteOfTheDay.quote}&rdquo;
             </blockquote>
-            
+
             <p className="text-purple-300 text-xs text-right">— {quoteOfTheDay.author}</p>
           </div>
         )}
@@ -192,11 +176,10 @@ Make them relevant to ${category} and perfect for someone facing career challeng
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`p-2 rounded-md transition-all text-xs ${
-                  selectedCategory === category.id
-                    ? `${category.color} text-white`
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
+                className={`p-2 rounded-md transition-all text-xs ${selectedCategory === category.id
+                  ? `${category.color} text-white`
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }`}
               >
                 <div className="text-sm mb-1">{category.icon}</div>
                 <div className="text-xs font-medium">{category.name}</div>
