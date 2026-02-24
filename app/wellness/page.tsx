@@ -26,41 +26,41 @@ function WellnessToolsContent() {
     setActiveTool(null);
   };
 
-  // Render the active tool or a placeholder
   const renderTool = () => {
     switch (activeTool) {
       case 'breathing':
         return <BreathingExercise onBack={handleCloseTool} />;
       case 'sounds':
         return (
-          <div className="p-4 sm:p-8 text-white bg-gray-900 rounded-lg max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-center">Calming Sounds</h3>
-            
+          <div className="p-4 sm:p-8 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-center" style={{ color: 'var(--text-primary)' }}>Calming Sounds</h3>
+
             {calmingVideos.map((video) => (
               <div key={video.id} className="mb-6">
-                <h4 className="text-base sm:text-lg font-medium mb-3 text-gray-300">{video.title}</h4>
+                <h4 className="text-base sm:text-lg font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>{video.title}</h4>
                 <div className="relative w-full pt-[56.25%] mb-4">
-                  <iframe 
-                    className="absolute top-0 left-0 w-full h-full rounded-lg"
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full rounded-xl"
                     src={`https://www.youtube.com/embed/${video.videoId}?${video.params}`}
                     title={video.title}
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    referrerPolicy="strict-origin-when-cross-origin" 
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
                     allowFullScreen
                   ></iframe>
                 </div>
               </div>
             ))}
-            
-            <p className="text-sm sm:text-base mb-6 text-center text-gray-300">
+
+            <p className="text-sm sm:text-base mb-6 text-center" style={{ color: 'var(--text-tertiary)' }}>
               Choose from our collection of calming videos to help you relax, focus, and reduce stress.
             </p>
-            
+
             <div className="flex justify-center">
-              <button 
+              <button
                 onClick={handleCloseTool}
-                className="w-full sm:w-auto px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl font-medium text-white transition-all"
+                style={{ background: 'var(--accent-primary)' }}
               >
                 Back to Tools
               </button>
@@ -75,22 +75,25 @@ function WellnessToolsContent() {
         return <DailyAffirmations onBack={handleCloseTool} />;
       default:
         return (
-          <div className="p-4 sm:p-8 text-center text-white">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Wellness Tools</h2>
-            <p className="text-base sm:text-lg mb-6 sm:mb-8">Select a tool to help manage stress and anxiety</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          <div className="p-4 sm:p-8 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Wellness Tools</h2>
+            <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>Select a tool to help manage stress and anxiety</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl mx-auto">
               {wellnessTools.map(tool => (
-                <div 
+                <div
                   key={tool.id}
                   onClick={() => setActiveTool(tool.id as WellnessTool)}
-                  className="bg-gray-900 p-4 sm:p-6 rounded-xl cursor-pointer hover:bg-gray-800 transition-colors flex items-center gap-3 sm:gap-4"
+                  className="p-5 rounded-xl cursor-pointer transition-all flex items-center gap-4"
+                  style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-primary)'}
                 >
-                  <div className={`w-12 h-12 sm:w-16 sm:h-16 ${tool.bgColor} rounded-full flex items-center justify-center ${tool.textColor} text-2xl sm:text-3xl`}>
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-2xl" style={{ background: 'var(--accent-surface)' }}>
                     {tool.icon}
                   </div>
                   <div>
-                    <h3 className="text-lg sm:text-xl font-semibold">{tool.name}</h3>
-                    <p className="text-gray-400 text-sm sm:text-base">Click to start</p>
+                    <h3 className="text-base sm:text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{tool.name}</h3>
+                    <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Click to start</p>
                   </div>
                 </div>
               ))}
@@ -103,7 +106,7 @@ function WellnessToolsContent() {
   return (
     <ChatProvider>
       <DashboardLayout>
-        <div className="max-w-6xl mx-auto p-4">
+        <div className="max-w-4xl mx-auto p-4">
           {renderTool()}
         </div>
       </DashboardLayout>
@@ -113,7 +116,11 @@ function WellnessToolsContent() {
 
 export default function WellnessTools() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+        <div className="w-6 h-6 rounded-full animate-spin" style={{ border: '2px solid var(--border-primary)', borderTopColor: 'var(--accent-primary)' }} />
+      </div>
+    }>
       <WellnessToolsContent />
     </Suspense>
   );

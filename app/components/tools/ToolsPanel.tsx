@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// import { FaTools } from 'react-icons/fa';
 import BreathingExercise from "../wellness/BreathingExercise";
 import JournalPrompt from "../wellness/JournalPrompt";
 import DailyAffirmations from "../wellness/DailyAffirmations";
@@ -16,7 +15,6 @@ export default function ToolsPanel() {
     setActiveTool(null);
   };
 
-  // Listen for wellness tool requests from the Chat component
   useEffect(() => {
     const handleOpenWellnessTool = (event: CustomEvent) => {
       const { toolId } = event.detail;
@@ -24,28 +22,26 @@ export default function ToolsPanel() {
     };
 
     window.addEventListener('openWellnessTool', handleOpenWellnessTool as EventListener);
-    
+
     return () => {
       window.removeEventListener('openWellnessTool', handleOpenWellnessTool as EventListener);
     };
   }, []);
 
-  // Render the correct tool component based on the selected tool
   const renderTool = () => {
     switch (activeTool) {
       case "breathing":
         return <BreathingExercise onBack={handleCloseTool} />;
       case "sounds":
-        // Calming Sounds tool with multiple YouTube videos
         return (
-          <div className="p-3 md:p-4 text-white max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-3 md:mb-4 text-center">
+          <div className="p-3 md:p-4 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-base font-semibold mb-3 text-center" style={{ color: 'var(--text-primary)' }}>
               Calming Sounds
             </h3>
-            
+
             {calmingVideos.map((video) => (
               <div key={video.id} className="mb-4">
-                <h4 className="text-sm md:text-base font-medium mb-2 text-gray-300">
+                <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   {video.title}
                 </h4>
                 <div className="relative w-full pt-[56.25%] mb-3">
@@ -62,15 +58,15 @@ export default function ToolsPanel() {
               </div>
             ))}
 
-            <p className="text-xs md:text-sm text-center text-gray-400 mb-4">
-              Choose from our collection of calming videos to help you relax and
-              reduce stress.
+            <p className="text-xs text-center mb-4" style={{ color: 'var(--text-tertiary)' }}>
+              Choose from our collection of calming videos.
             </p>
 
             <div className="flex justify-center">
               <button
                 onClick={handleCloseTool}
-                className="px-3 md:px-4 py-1 md:py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm md:text-base transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-all text-white"
+                style={{ background: 'var(--accent-primary)' }}
               >
                 Back
               </button>
@@ -88,34 +84,34 @@ export default function ToolsPanel() {
     }
   };
 
-  // If a tool is active, render it full width
   if (activeTool) {
     return (
-      <div className="bg-gray-900 rounded-lg shadow-md overflow-hidden">
+      <div className="rounded-xl overflow-hidden" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}>
         {renderTool()}
       </div>
     );
   }
-  // Otherwise render the tool selection buttons
+
   return (
-    <div className="bg-gray-900 rounded-lg p-3 md:p-4">
-      <h3 className="text-lg font-semibold mb-4 md:mb-6 flex items-center gap-2 text-purple-400">
-        <span className="text-purple-400">🔧</span>
-        <span>Tools</span>
+    <div className="p-3">
+      <h3 className="text-sm font-semibold mb-4 flex items-center gap-2 px-1" style={{ color: 'var(--text-tertiary)' }}>
+        <span>🛠️</span>
+        <span className="uppercase tracking-wider text-xs">Tools</span>
       </h3>
-      <div className="grid grid-cols-1 gap-3 md:gap-4">
+      <div className="flex flex-col gap-1">
         {wellnessTools.map((tool) => (
           <button
             key={tool.id}
             onClick={() => setActiveTool(tool.id as WellnessTool)}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-3 p-2.5 rounded-lg transition-all"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
           >
-            <div
-              className={`w-8 h-8 md:w-10 md:h-10 ${tool.bgColor} rounded-full flex items-center justify-center ${tool.textColor} text-xl`}
-            >
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base" style={{ background: 'var(--accent-surface)' }}>
               {tool.icon}
             </div>
-            <span className="text-white text-sm md:text-base">{tool.name}</span>
+            <span className="text-sm">{tool.name}</span>
           </button>
         ))}
       </div>

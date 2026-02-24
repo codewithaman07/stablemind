@@ -1,97 +1,139 @@
-import { FaComments, FaBook, FaUserFriends, FaRegSmile, FaRegLifeRing, FaHeart, FaTimes, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
-import { useUser, SignOutButton, SignInButton } from '@clerk/nextjs';
+import { FaComments, FaBook, FaUserFriends, FaRegSmile, FaHeart, FaTimes } from "react-icons/fa";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+
+import Logo from './Logo';
 
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  onToggle?: () => void;
   clearChat?: () => void;
-  isGuestMode?: boolean;
 }
 
-export default function Sidebar({ isOpen, onClose, clearChat, isGuestMode }: SidebarProps) {
+export default function Sidebar({ isOpen = true, onClose, onToggle, clearChat }: SidebarProps) {
   const router = useRouter();
-  const { user, isSignedIn } = useUser();
-  
+  const pathname = usePathname();
+
   const handleNewChat = () => {
     if (clearChat) {
-      clearChat(); 
+      clearChat();
     }
-    router.push('/dashboard'); 
+    router.push('/dashboard');
   };
+
+  const navItems = [
+    { icon: <FaComments size={18} />, label: 'New Chat', action: handleNewChat, path: null },
+    { icon: <FaBook size={18} />, label: 'Affirmations', path: '/affirmations' },
+    { icon: <FaUserFriends size={18} />, label: 'Peer Support', path: '/community' },
+    { icon: <FaRegSmile size={18} />, label: 'Mood Tracker', path: '/mood' },
+    { icon: <FaHeart size={18} />, label: 'Wellness Tools', path: '/wellness' },
+  ];
+
   return (
-    <aside className={`w-64 min-h-screen bg-gray-900 border-r border-gray-800 flex flex-col p-4 gap-2 
-      ${isOpen !== undefined ? (isOpen ? 'fixed right-0 top-0 h-full z-20 shadow-lg' : 'hidden') : ''} 
-      md:static md:block`}>
-      <div className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-purple-900 rounded-full flex items-center justify-center text-2xl font-bold text-purple-300">SM</div>
-          <span className="text-xl font-bold text-white">StableMind</span>
-        </div>
-        
-        {/* Close button - only visible on mobile when sidebar is open */}
-        {onClose && (
-          <button 
-            onClick={onClose}
-            className="md:hidden p-2 text-gray-400 hover:text-white"
-            aria-label="Close sidebar"
-          >
-            <FaTimes size={20} />
-          </button>
-        )}
-      </div>      <nav className="flex flex-col gap-2">
-        <button 
-          onClick={handleNewChat}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium text-left"
-        >
-          <FaComments className="text-indigo-400" /> New Chat
-        </button>
-        <Link href="/affirmations" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium">
-          <FaBook className="text-green-600" /> Affirmations
-        </Link>
-        <Link href="/community" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium">
-          <FaUserFriends className="text-green-400" /> Peer Support
-        </Link>
-        <Link href="/mood" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium">
-          <FaRegSmile className="text-yellow-400" /> Mood Tracker
-        </Link>
-        <Link href="/wellness" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium">
-          <FaHeart className="text-red-400" /> Wellness Tools
-        </Link>        <Link href="/resources" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 text-gray-200 font-medium">
-          <FaRegLifeRing className="text-orange-400" /> Resources
-        </Link>
-      </nav>
-      <div className="mt-auto pt-8 border-t border-gray-800">
-        <div className="text-xs text-gray-500 mb-1">
-          {isSignedIn ? 'Signed in as' : 'Not signed in'}
-        </div>
-        <div className="font-semibold text-gray-200 mb-3">
-          {isSignedIn 
-            ? (user?.firstName || user?.emailAddresses[0]?.emailAddress || 'User')
-            : isGuestMode 
-              ? 'Guest User' 
-              : 'Guest'
-          }
-        </div>
-        {isSignedIn ? (
-          <SignOutButton>
-            <button className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-              <FaSignOutAlt />
-              Sign Out
-            </button>
-          </SignOutButton>
-        ) : isGuestMode && (
-          <div className="space-y-2">
-            <SignInButton mode="modal">
-              <button className="flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
-                <FaSignInAlt />
-                Sign In for Full Access
-              </button>
-            </SignInButton>
+    <aside
+      className="w-full h-full flex flex-col p-3 gap-1"
+      style={{ background: 'transparent' }}
+    >
+      {/* Top Header */}
+      <div className={`mb-6 flex items-center ${isOpen ? 'justify-between px-2' : 'justify-center'} py-2 overflow-hidden whitespace-nowrap`}>
+        {isOpen && (
+          <div className="flex items-center gap-2.5 animate-fade-in">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0" style={{ background: 'var(--accent-primary)' }}>
+              <Logo size={18} />
+            </div>
+            <span className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>StableMind</span>
           </div>
         )}
+
+        <div className="flex items-center gap-1">
+          {/* Toggle Button for Desktop */}
+          {onToggle && (
+            <button
+              onClick={onToggle}
+              className="hidden md:flex p-2 rounded-lg transition-colors flex-shrink-0"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+              aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+              title={isOpen ? "Close sidebar" : "Open sidebar"}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="9" y1="3" x2="9" y2="21" />
+                {isOpen ? <polyline points="15 9 12 12 15 15" /> : <polyline points="15 9 12 12 15 15" transform="rotate(180 13.5 12)" />}
+              </svg>
+            </button>
+          )}
+
+          {/* Close button (visible only on mobile) */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="md:hidden p-2 rounded-lg transition-colors flex-shrink-0"
+              style={{ color: 'var(--text-tertiary)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-tertiary)'; }}
+              aria-label="Close sidebar"
+            >
+              <FaTimes size={18} />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Navigation */}
+      <nav className="flex flex-col gap-1">
+        {navItems.map((item, index) => {
+          const isActive = item.path ? pathname === item.path : false;
+
+          const buttonContent = (
+            <>
+              <span className="flex-shrink-0 flex items-center justify-center w-6" style={{ color: isActive ? 'var(--accent-primary)' : 'var(--text-tertiary)' }}>
+                {item.icon}
+              </span>
+              {isOpen && <span className="ml-2 animate-fade-in truncate">{item.label}</span>}
+            </>
+          );
+
+          if (item.action) {
+            return (
+              <button
+                key={index}
+                onClick={item.action}
+                className={`flex items-center ${isOpen ? 'px-3' : 'justify-center'} py-3 rounded-lg text-sm font-medium transition-all group`}
+                style={{
+                  color: 'var(--text-secondary)',
+                  background: 'transparent',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                title={!isOpen ? item.label : undefined}
+              >
+                {buttonContent}
+              </button>
+            );
+          }
+
+          return (
+            <Link
+              key={index}
+              href={item.path || '/'}
+              className={`flex items-center ${isOpen ? 'px-3' : 'justify-center'} py-3 rounded-lg text-sm font-medium transition-all group`}
+              style={{
+                color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                background: isActive ? 'var(--bg-tertiary)' : 'transparent',
+              }}
+              onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'var(--bg-tertiary)'; e.currentTarget.style.color = 'var(--text-primary)'; } }}
+              onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; } }}
+              title={!isOpen ? item.label : undefined}
+            >
+              {buttonContent}
+            </Link>
+          );
+        })}
+      </nav>
+
     </aside>
   );
 }
