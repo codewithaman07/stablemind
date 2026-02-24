@@ -127,7 +127,7 @@ export default function DashboardLayout({
                   appearance={{
                     elements: {
                       userButtonBox: "w-8 h-8 rounded-lg overflow-hidden",
-                      userButtonTrigger: "w-8 h-8 rounded-lg overflow-hidden ring-2 ring-[var(--border-primary)] hover:ring-[var(--accent-primary)] hover:scale-105 transition-all outline-none",
+                      userButtonTrigger: "w-8 h-8 rounded-lg overflow-hidden hover:scale-105 transition-all outline-none border-0",
                       avatarBox: "rounded-lg",
                       userButtonAvatarBox: "rounded-lg"
                     }

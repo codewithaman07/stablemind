@@ -217,7 +217,7 @@ export default function Chat() {
       {/* Input Area */}
       <div className="px-4 py-3 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
         <div className="max-w-2xl mx-auto">
-          <div className="relative flex items-end rounded-xl overflow-hidden" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-primary)' }}>
+          <div className="relative flex items-end rounded-2xl overflow-hidden" style={{ background: 'var(--bg-tertiary)' }}>
             <textarea
               ref={textareaRef}
               value={inputMessage}
@@ -228,8 +228,8 @@ export default function Chat() {
                   handleSendMessage();
                 }
               }}
-              className="flex-1 px-4 py-3 bg-transparent focus:outline-none resize-none text-sm leading-relaxed"
-              style={{ color: 'var(--text-primary)', minHeight: '44px', maxHeight: '200px' }}
+              className="flex-1 px-4 py-3 bg-transparent focus:outline-none focus-visible:outline-none resize-none text-sm leading-relaxed"
+              style={{ color: 'var(--text-primary)', outline: 'none', minHeight: '44px', maxHeight: '200px' }}
               placeholder="Message StableMind..."
               rows={1}
             />
