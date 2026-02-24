@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { DetectedEmotion } from '../services/emotionDetection';
 
 interface Message {
@@ -17,49 +17,16 @@ interface ChatContextType {
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
+const INITIAL_MESSAGES: Message[] = [{
+  role: "bot",
+  content: "Hi there! I'm StableMind, your placement companion. How can I help you today with your placement preparation or career concerns?"
+}];
+
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const [messages, setMessages] = useState<Message[]>(() => {
-    // Try to load messages from localStorage on component mount (client-side only)
-    if (typeof window !== 'undefined') {
-      const savedMessages = localStorage.getItem('stablemind_chat_history');
-      if (savedMessages) {
-        try {
-          return JSON.parse(savedMessages);
-        } catch (error) {
-          console.error("Failed to parse saved chat history:", error);
-        }
-      }
-    }
-    // Default initial message if nothing in localStorage
-    return [ 
-      { 
-        role: "bot", 
-        content: "Hi there! I'm StableMind, your placement companion. How can I help you today with your placement preparation or career concerns?" 
-      }
-    ];
-  });
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
 
-  // Save messages to localStorage whenever they change
-  useEffect(() => {
-    if (typeof window !== 'undefined' && messages.length > 0) {
-      localStorage.setItem('stablemind_chat_history', JSON.stringify(messages));
-    }
-  }, [messages]);
-
-  // Function to clear chat history
   const clearChatHistory = () => {
-    // Reset to initial message
-    const initialMessage: Message[] = [{ 
-      role: "bot", 
-      content: "Hi there! I'm StableMind, your placement companion. How can I help you today with your placement preparation or career concerns?" 
-    }];
-    
-    setMessages(initialMessage);
-    
-    // Also clear from localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('stablemind_chat_history', JSON.stringify(initialMessage));
-    }
+    setMessages(INITIAL_MESSAGES);
   };
 
   return (

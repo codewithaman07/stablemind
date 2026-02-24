@@ -1,5 +1,3 @@
-"use client";
-
 import { WellnessTool } from '../components/wellness/WellnessToolsConfig';
 
 // Define emotion types and their corresponding keywords
@@ -119,20 +117,20 @@ export interface DetectedEmotion {
 export function detectEmotions(message: string): DetectedEmotion[] {
   const lowercaseMessage = message.toLowerCase();
   const detectedEmotions: DetectedEmotion[] = [];
-  
+
   // Check each emotion type
   Object.entries(emotionMap).forEach(([emotionType, config]) => {
-    const matchedKeywords = config.keywords.filter(keyword => 
+    const matchedKeywords = config.keywords.filter(keyword =>
       lowercaseMessage.includes(keyword.toLowerCase())
     );
-    
+
     if (matchedKeywords.length > 0) {
       // Calculate confidence based on number of matched keywords and message length
       const confidence = Math.min(
         (matchedKeywords.length / config.keywords.length) * 100,
         (matchedKeywords.length / message.split(' ').length) * 100
       );
-      
+
       detectedEmotions.push({
         emotion: emotionType as EmotionType,
         confidence,
@@ -142,7 +140,7 @@ export function detectEmotions(message: string): DetectedEmotion[] {
       });
     }
   });
-  
+
   // Sort by confidence and return top emotions
   return detectedEmotions
     .sort((a, b) => b.confidence - a.confidence)
@@ -151,7 +149,7 @@ export function detectEmotions(message: string): DetectedEmotion[] {
 
 export function getEmotionBasedSuggestions(message: string): DetectedEmotion[] {
   const emotions = detectEmotions(message);
-  
+
   // Filter out duplicate tools and low-confidence detections
   const uniqueTools = new Set<WellnessTool>();
   return emotions.filter(emotion => {

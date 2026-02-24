@@ -33,28 +33,22 @@ const fallbackQuotes: Quote[] = [
   }
 ];
 
-// Improved quote parsing function
 const parseQuoteResponse = (response: string, category: string): Quote[] => {
   const cleanText = response.replace(/<[^>]*>/g, '').trim();
-  console.log('Raw response:', cleanText); // Debug log
-  
   const quotes: Quote[] = [];
-  
-  // Try multiple parsing strategies
-  
-  // Strategy 1: Look for numbered quotes with various formats
+
   const numberedQuotePatterns = [
     /(?:Quote\s*)?(\d+)[:.\s]*["']([^"']+)["']\s*[-–—]\s*([^\n\r]+)/gi,
     /(?:Quote\s*)?(\d+)[:.\s]*["']([^"']+)["']\s*by\s+([^\n\r]+)/gi,
     /(?:Quote\s*)?(\d+)[:.\s]*["']([^"']+)["']\s*-\s*([^\n\r]+)/gi,
     /(\d+)[:.\s]*["']([^"']+)["']\s*[-–—]\s*([^\n\r]+)/gi
   ];
-  
+
   for (const pattern of numberedQuotePatterns) {
     const matches = [...cleanText.matchAll(pattern)];
     if (matches.length > 0) {
       matches.forEach(match => {
-        if (match[2] && match[2].trim().length > 10) { // Ensure quote is substantial
+        if (match[2] && match[2].trim().length > 10) {
           quotes.push({
             quote: match[2].trim(),
             author: match[3] ? match[3].trim() : 'Unknown',
@@ -65,14 +59,13 @@ const parseQuoteResponse = (response: string, category: string): Quote[] => {
       if (quotes.length > 0) return quotes;
     }
   }
-  
-  // Strategy 2: Look for quotes without numbers
+
   const generalQuotePatterns = [
     /["']([^"']{20,})["']\s*[-–—]\s*([^\n\r]+)/g,
     /["']([^"']{20,})["']\s*by\s+([^\n\r]+)/g,
     /["']([^"']{20,})["']\s*-\s*([^\n\r]+)/g
   ];
-  
+
   for (const pattern of generalQuotePatterns) {
     const matches = [...cleanText.matchAll(pattern)];
     if (matches.length > 0) {
@@ -86,40 +79,7 @@ const parseQuoteResponse = (response: string, category: string): Quote[] => {
       if (quotes.length > 0) return quotes;
     }
   }
-  
-  // Strategy 3: Split by line and look for quote-like patterns
-  const lines = cleanText.split('\n').filter(line => line.trim().length > 0);
-  let currentQuote = '';
-  let currentAuthor = '';
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    
-    // Look for lines that start with quotes
-    if (line.match(/^["']/) && line.length > 20) {
-      currentQuote = line.replace(/^["']|["']$/g, '');
-      
-      // Look for author in next few lines
-      for (let j = i + 1; j < Math.min(i + 3, lines.length); j++) {
-        const nextLine = lines[j].trim();
-        if (nextLine.match(/^[-–—]/) || nextLine.toLowerCase().includes('author') || nextLine.match(/^by\s/i)) {
-          currentAuthor = nextLine.replace(/^[-–—]\s*|^author:?\s*|^by\s*/i, '').trim();
-          break;
-        }
-      }
-      
-      if (currentQuote.length > 10) {
-        quotes.push({
-          quote: currentQuote,
-          author: currentAuthor || 'Unknown',
-          category: category
-        });
-        currentQuote = '';
-        currentAuthor = '';
-      }
-    }
-  }
-  
+
   return quotes;
 };
 
@@ -139,15 +99,7 @@ export default function AffirmationsPage() {
   ];
 
   useEffect(() => {
-    const today = new Date().toDateString();
-    const cachedQuote = localStorage.getItem('quoteOfTheDay');
-    const cachedDate = localStorage.getItem('quoteOfTheDayDate');
-
-    if (cachedQuote && cachedDate === today) {
-      setQuoteOfTheDay(JSON.parse(cachedQuote));
-    } else {
-      fetchQuoteOfTheDay();
-    }
+    fetchQuoteOfTheDay();
   }, []);
 
   const fetchQuoteOfTheDay = async () => {
@@ -163,41 +115,29 @@ Example:
 Make it uplifting and relevant to career growth.`;
 
       const response = await chatWithGemini(prompt);
-      console.log('Quote of the day response:', response);
-      
-      // Simple parsing for single quote
       const quoteMatch = response.match(/["']([^"']+)["']\s*[-–—]\s*([^\n\r]+)/);
-      
+
       if (quoteMatch && quoteMatch[1].trim().length > 10) {
         const quote: Quote = {
           quote: quoteMatch[1].trim(),
           author: quoteMatch[2] ? quoteMatch[2].trim().replace(/<[^>]*>/g, '') : 'Unknown',
           category: "inspirational"
         };
-        
-        const today = new Date().toDateString();
         setQuoteOfTheDay(quote);
-        localStorage.setItem('quoteOfTheDay', JSON.stringify(quote));
-        localStorage.setItem('quoteOfTheDayDate', today);
         return;
       }
     } catch (error) {
       console.error('Error fetching quote from Gemini:', error);
     }
-    
-    // Fallback
+
     const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
-    const today = new Date().toDateString();
-    
     setQuoteOfTheDay(randomQuote);
-    localStorage.setItem('quoteOfTheDay', JSON.stringify(randomQuote));
-    localStorage.setItem('quoteOfTheDayDate', today);
   };
 
   const fetchQuotesByCategory = async (category: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const prompt = `Generate exactly 3 inspiring ${category} quotes for students and professionals. Each quote should be complete and meaningful.
 
@@ -212,15 +152,11 @@ Please respond in this EXACT format:
 Make sure each quote is complete and relates to ${category}. Do not cut off any quotes.`;
 
       const response = await chatWithGemini(prompt);
-      console.log('Category quotes response:', response);
-      
       const parsedQuotes = parseQuoteResponse(response, category);
-      
+
       if (parsedQuotes.length > 0) {
         setQuotes(parsedQuotes);
       } else {
-        // If parsing failed, try fallback parsing
-        console.log('Parsing failed, trying fallback...');
         setError('Generated quotes but had trouble parsing. Using fallback quotes.');
         const categoryQuotes = fallbackQuotes.filter(q => q.category === category);
         setQuotes(categoryQuotes.length > 0 ? categoryQuotes : fallbackQuotes);
@@ -228,11 +164,10 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
     } catch (error) {
       console.error('Error fetching quotes from Gemini:', error);
       setError('Unable to generate new quotes. Showing fallback quotes.');
-      
       const categoryQuotes = fallbackQuotes.filter(q => q.category === category);
       setQuotes(categoryQuotes.length > 0 ? categoryQuotes : fallbackQuotes);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -245,8 +180,6 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
   };
 
   const refreshQuoteOfTheDay = () => {
-    localStorage.removeItem('quoteOfTheDay');
-    localStorage.removeItem('quoteOfTheDayDate');
     fetchQuoteOfTheDay();
   };
 
@@ -259,11 +192,9 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Daily Affirmations</h1>
               <p className="text-gray-400">Start your day with inspiration and positivity</p>
             </div>
-            
-            {/* Width Control */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-400">Width:</span>
-              <select 
+              <select
                 value={pageWidth}
                 onChange={(e) => setPageWidth(e.target.value)}
                 className="bg-gray-800 text-white px-3 py-1 rounded-lg border border-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -277,14 +208,11 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
             </div>
           </div>
 
-          {/* Quote of the Day */}
           {quoteOfTheDay && (
             <div className="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-xl p-6 mb-8 border border-purple-700">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-2xl">
-                    ☀️
-                  </div>
+                  <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-2xl">☀️</div>
                   <div>
                     <h2 className="text-xl font-semibold text-white">Quote of the Day</h2>
                     <p className="text-purple-300 text-sm">Your daily dose of inspiration</p>
@@ -298,16 +226,13 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
                   🔄
                 </button>
               </div>
-              
               <blockquote className="text-lg sm:text-xl text-white mb-4 italic leading-relaxed">
                 &ldquo;{quoteOfTheDay.quote}&rdquo;
               </blockquote>
-              
               <p className="text-purple-300 text-right">— {quoteOfTheDay.author}</p>
             </div>
           )}
 
-          {/* Category Selection */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-white mb-4">Choose a Category</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -315,11 +240,10 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`p-3 rounded-lg transition-all duration-200 ${
-                    selectedCategory === category.id
-                      ? `${category.color} text-white shadow-lg scale-105`
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  }`}
+                  className={`p-3 rounded-lg transition-all duration-200 ${selectedCategory === category.id
+                    ? `${category.color} text-white shadow-lg scale-105`
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    }`}
                 >
                   <div className="text-2xl mb-1">{category.icon}</div>
                   <div className="text-xs sm:text-sm font-medium">{category.name}</div>
@@ -328,7 +252,6 @@ Make sure each quote is complete and relates to ${category}. Do not cut off any 
             </div>
           </div>
 
-          {/* Selected Category Quotes */}
           <div className="bg-gray-900 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-white capitalize">
