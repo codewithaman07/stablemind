@@ -5,8 +5,10 @@ import { useEffect, useState, Suspense } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import BreathingExercise from '../components/wellness/BreathingExercise';
 import JournalPrompt from '../components/wellness/JournalPrompt';
-import DailyAffirmations from '../components/wellness/DailyAffirmations';
 import GroundingTechnique from '../components/wellness/GroundingTechnique';
+import PomodoroTimer from '../components/wellness/PomodoroTimer';
+import BodyScan from '../components/wellness/BodyScan';
+import Visualization from '../components/wellness/Visualization';
 import { WellnessTool, wellnessTools } from '../components/wellness/WellnessToolsConfig';
 import { calmingVideos } from '../components/wellness/CalmingVideos';
 import { ChatProvider } from '../context/ChatContext';
@@ -71,8 +73,12 @@ function WellnessToolsContent() {
         return <GroundingTechnique onBack={handleCloseTool} />;
       case 'journal':
         return <JournalPrompt onBack={handleCloseTool} />;
-      case 'affirmations':
-        return <DailyAffirmations onBack={handleCloseTool} />;
+      case 'pomodoro':
+        return <PomodoroTimer onBack={handleCloseTool} />;
+      case 'bodyscan':
+        return <BodyScan onBack={handleCloseTool} />;
+      case 'visualization':
+        return <Visualization onBack={handleCloseTool} />;
       default:
         return (
           <div className="p-4 sm:p-8 text-center">

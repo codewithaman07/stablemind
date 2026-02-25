@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import BreathingExercise from "../wellness/BreathingExercise";
 import JournalPrompt from "../wellness/JournalPrompt";
-import DailyAffirmations from "../wellness/DailyAffirmations";
 import GroundingTechnique from "../wellness/GroundingTechnique";
+import PomodoroTimer from "../wellness/PomodoroTimer";
+import BodyScan from "../wellness/BodyScan";
+import Visualization from "../wellness/Visualization";
 import { WellnessTool, wellnessTools } from "../wellness/WellnessToolsConfig";
 import { calmingVideos } from "../wellness/CalmingVideos";
 
@@ -77,8 +79,12 @@ export default function ToolsPanel() {
         return <GroundingTechnique onBack={handleCloseTool} />;
       case "journal":
         return <JournalPrompt onBack={handleCloseTool} />;
-      case "affirmations":
-        return <DailyAffirmations onBack={handleCloseTool} />;
+      case "pomodoro":
+        return <PomodoroTimer onBack={handleCloseTool} />;
+      case "bodyscan":
+        return <BodyScan onBack={handleCloseTool} />;
+      case "visualization":
+        return <Visualization onBack={handleCloseTool} />;
       default:
         return null;
     }

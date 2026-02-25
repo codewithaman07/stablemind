@@ -11,12 +11,32 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function safeGetTheme(): Theme | null {
+    if (typeof window === 'undefined') return null;
+    try {
+        const saved = window.localStorage.getItem('stablemind-theme');
+        if (saved === 'light' || saved === 'dark') return saved;
+    } catch {
+        // localStorage not available (e.g. SSR, incognito restrictions)
+    }
+    return null;
+}
+
+function safeSaveTheme(theme: Theme) {
+    if (typeof window === 'undefined') return;
+    try {
+        window.localStorage.setItem('stablemind-theme', theme);
+    } catch {
+        // Silently fail
+    }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
     const [theme, setTheme] = useState<Theme>('dark');
 
     useEffect(() => {
-        const saved = localStorage.getItem('stablemind-theme') as Theme | null;
-        if (saved === 'light' || saved === 'dark') {
+        const saved = safeGetTheme();
+        if (saved) {
             setTheme(saved);
             document.documentElement.setAttribute('data-theme', saved);
         }
@@ -26,7 +46,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const next = theme === 'dark' ? 'light' : 'dark';
         setTheme(next);
         document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('stablemind-theme', next);
+        safeSaveTheme(next);
     };
 
     return (

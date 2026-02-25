@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Message is required' }, { status: 400 });
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        // Using gemini-2.0-flash for low-latency chat responses (~1-3s vs 5-20s with reasoning models)
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const isCrisisMessage = detectCrisis(message);
         const detectedEmotions = getEmotionBasedSuggestions(message);
 

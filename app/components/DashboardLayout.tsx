@@ -52,9 +52,14 @@ export default function DashboardLayout({
 
   const toggleLeftSidebar = () => setLeftSidebarOpen(!leftSidebarOpen);
 
+  // Use relative widths: ~14vw open (clamped 13rem–17rem), ~4.25rem collapsed
+  const sidebarWidth = leftSidebarOpen
+    ? (isMobile ? '80vw' : 'clamp(13rem, 14vw, 17rem)')
+    : (isMobile ? '0px' : '4.25rem');
+
   return (
     <LayoutContext.Provider value={{ leftSidebarOpen, setLeftSidebarOpen, toggleLeftSidebar }}>
-      <div className="flex min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+      <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
 
         {/* Mobile overlay */}
         {isMobile && leftSidebarOpen && (
@@ -68,15 +73,15 @@ export default function DashboardLayout({
         <div
           className="flex-shrink-0 transition-all duration-300 ease-in-out border-r z-40 bg-[var(--bg-secondary)] border-[var(--border-primary)]"
           style={{
-            width: leftSidebarOpen ? '260px' : (isMobile ? '0px' : '68px'),
+            width: sidebarWidth,
             position: isMobile ? 'fixed' : 'relative',
             top: 0,
-            left: 0,
-            height: isMobile ? '100vh' : 'auto',
-            overflow: 'hidden'
+            left: isMobile ? 0 : undefined,
+            height: '100%',
+            overflow: 'hidden',
           }}
         >
-          <div className="w-full h-full">
+          <div className="w-full h-full overflow-y-auto">
             <Sidebar
               isOpen={leftSidebarOpen}
               onClose={toggleLeftSidebar}
@@ -87,9 +92,9 @@ export default function DashboardLayout({
         </div>
 
         {/* Main area */}
-        <div className="flex-1 flex flex-col min-w-0 relative">
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
           {/* Top bar with toggles */}
-          <div className="sticky top-0 z-20 px-3 py-2.5 flex items-center gap-3 border-b" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
+          <div className="flex-shrink-0 px-3 py-2.5 flex items-center gap-3 border-b z-20" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
             {/* Mobile toggle */}
             {!leftSidebarOpen && isMobile && (
               <button
@@ -137,8 +142,8 @@ export default function DashboardLayout({
             </div>
           </div>
 
-          {/* Main content */}
-          <main className="flex-1 overflow-y-auto">
+          {/* Main content — fills remaining height */}
+          <main className="flex-1 overflow-y-auto min-h-0">
             {children}
           </main>
         </div>

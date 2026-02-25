@@ -8,7 +8,7 @@ import { useChatContext } from "../context/ChatContext";
 import Logo from "./Logo";
 
 export default function Chat() {
-  const { messages, setMessages } = useChatContext();
+  const { messages, setMessages, persistMessage } = useChatContext();
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -22,7 +22,8 @@ export default function Chat() {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
+      const maxH = parseFloat(getComputedStyle(document.documentElement).fontSize) * 12.5; // 12.5rem
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, maxH) + 'px';
     }
   }, [inputMessage]);
 
@@ -39,6 +40,9 @@ export default function Chat() {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage("");
     setIsLoading(true);
+
+    // Persist user message to Supabase
+    persistMessage("user", inputMessage);
 
     const isCrisisMessage = detectCrisis(inputMessage);
 
@@ -81,20 +85,21 @@ export default function Chat() {
         ...(data.detectedEmotions?.length > 0 && { emotionSuggestions: data.detectedEmotions })
       };
       setMessages(prev => [...prev, botMessage]);
+
+      // Persist bot response to Supabase
+      persistMessage("bot", data.response);
     } catch (error) {
       console.error("Error in chat process:", error);
 
+      let errorContent: string;
       if (isCrisisMessage) {
-        setMessages(prev => [...prev, {
-          role: "bot",
-          content: `I'm having trouble connecting right now, but please reach out for support: ${mentalHealthHelplines}`
-        }]);
+        errorContent = `I'm having trouble connecting right now, but please reach out for support: ${mentalHealthHelplines}`;
       } else {
-        setMessages(prev => [...prev, {
-          role: "bot",
-          content: "I'm having trouble connecting right now. Please try again in a moment."
-        }]);
+        errorContent = "I'm having trouble connecting right now. Please try again in a moment.";
       }
+
+      setMessages(prev => [...prev, { role: "bot", content: errorContent }]);
+      persistMessage("bot", errorContent);
     } finally {
       setIsLoading(false);
     }
@@ -229,7 +234,7 @@ export default function Chat() {
                 }
               }}
               className="flex-1 px-4 py-3 bg-transparent focus:outline-none focus-visible:outline-none resize-none text-sm leading-relaxed"
-              style={{ color: 'var(--text-primary)', outline: 'none', minHeight: '44px', maxHeight: '200px' }}
+              style={{ color: 'var(--text-primary)', outline: 'none', minHeight: '2.75rem', maxHeight: '12.5rem' }}
               placeholder="Message StableMind..."
               rows={1}
             />
