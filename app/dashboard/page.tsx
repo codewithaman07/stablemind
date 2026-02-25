@@ -8,7 +8,7 @@ import Logo from "../components/Logo";
 
 function DashboardContent() {
   return (
-    <div className="h-[calc(100vh-45px)] flex relative">
+    <div className="h-full flex relative">
       <div className="flex-1 min-w-0">
         <Chat />
       </div>

@@ -42,9 +42,9 @@ const emotionMap: EmotionKeywords = {
       'grief', 'grieving', 'loss', 'mourning', 'melancholy', 'gloomy', 'miserable',
       'defeated', 'broken'
     ],
-    tool: 'affirmations',
-    buttonText: 'View Uplifting Affirmations',
-    description: 'Gentle reminders of your worth and strength'
+    tool: 'visualization',
+    buttonText: 'Try Positive Visualization',
+    description: 'A guided journey to help lift your spirits'
   },
   anger: {
     keywords: [
@@ -91,18 +91,18 @@ const emotionMap: EmotionKeywords = {
       'grateful', 'thankful', 'blessed', 'appreciate', 'appreciation', 'fortunate',
       'lucky', 'counting blessings', 'grateful for', 'thank you', 'thankfulness'
     ],
-    tool: 'affirmations',
-    buttonText: 'View Positive Affirmations',
-    description: 'Celebrate your gratitude and positivity'
+    tool: 'journal',
+    buttonText: 'Try Journal Prompt',
+    description: 'Reflect on gratitude and positivity'
   },
   excited: {
     keywords: [
       'excited', 'enthusiasm', 'enthusiastic', 'thrilled', 'elated', 'overjoyed',
       'happy', 'joyful', 'ecstatic', 'pumped', 'energized', 'motivated', 'inspired'
     ],
-    tool: 'affirmations',
-    buttonText: 'View Positive Affirmations',
-    description: 'Amplify your positive energy'
+    tool: 'journal',
+    buttonText: 'Try Journal Prompt',
+    description: 'Capture and amplify your positive energy'
   }
 };
 

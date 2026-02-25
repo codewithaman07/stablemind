@@ -1,7 +1,7 @@
 'use client';
 
 // This will be exported and used by both the ToolsPanel and Chat components
-export type WellnessTool = 'breathing' | 'sounds' | 'grounding' | 'journal' | 'affirmations' | null;
+export type WellnessTool = 'breathing' | 'sounds' | 'grounding' | 'journal' | 'pomodoro' | 'bodyscan' | 'visualization' | null;
 
 // This ensures consistency between sidebar tools and chat suggestion buttons
 export const wellnessTools = [
@@ -34,10 +34,24 @@ export const wellnessTools = [
     textColor: 'text-purple-300'
   },
   {
-    id: 'affirmations',
-    name: 'Daily Affirmations',
-    icon: '✨',
-    bgColor: 'bg-pink-900',
-    textColor: 'text-pink-300'
+    id: 'pomodoro',
+    name: 'Focus Timer',
+    icon: '⏱️',
+    bgColor: 'bg-red-900',
+    textColor: 'text-red-300'
+  },
+  {
+    id: 'bodyscan',
+    name: 'Body Scan',
+    icon: '🧘',
+    bgColor: 'bg-teal-900',
+    textColor: 'text-teal-300'
+  },
+  {
+    id: 'visualization',
+    name: 'Visualization',
+    icon: '🌄',
+    bgColor: 'bg-indigo-900',
+    textColor: 'text-indigo-300'
   }
 ];
