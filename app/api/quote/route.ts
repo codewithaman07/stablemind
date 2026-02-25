@@ -8,6 +8,10 @@ let batchCacheTime = 0;
 const DAILY_CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 const BATCH_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
+// Rate-limit backoff: extend cache on consecutive failures to avoid hammering the API
+let consecutiveFailures = 0;
+const MAX_BACKOFF_MULTIPLIER = 4; // Max 4x cache duration on repeated failures
+
 const fallbackQuotes = [
     { q: "The only way to do great work is to love what you do.", a: "Steve Jobs" },
     { q: "Believe you can and you're halfway there.", a: "Theodore Roosevelt" },
@@ -26,6 +30,11 @@ const fallbackQuotes = [
     { q: "Everything you've ever wanted is on the other side of fear.", a: "George Addair" },
     { q: "Hardships often prepare ordinary people for an extraordinary destiny.", a: "C.S. Lewis" },
 ];
+
+function getBackoffDuration(baseDuration: number): number {
+    const multiplier = Math.min(Math.pow(2, consecutiveFailures), MAX_BACKOFF_MULTIPLIER);
+    return baseDuration * multiplier;
+}
 
 export async function GET(request: NextRequest) {
     const mode = request.nextUrl.searchParams.get('mode') || 'today';
@@ -48,7 +57,8 @@ export async function GET(request: NextRequest) {
 
 async function fetchDailyQuote() {
     const now = Date.now();
-    if (cachedDailyQuote && (now - dailyCacheTime) < DAILY_CACHE_DURATION) {
+    const cacheDuration = getBackoffDuration(DAILY_CACHE_DURATION);
+    if (cachedDailyQuote && (now - dailyCacheTime) < cacheDuration) {
         return NextResponse.json(cachedDailyQuote);
     }
 
@@ -57,24 +67,27 @@ async function fetchDailyQuote() {
             next: { revalidate: 3600 },
         });
 
-        if (!response.ok) throw new Error('ZenQuotes API error');
+        if (!response.ok) throw new Error(`ZenQuotes API error: ${response.status}`);
         const data = await response.json();
 
         if (data && data.length > 0 && data[0].q) {
             cachedDailyQuote = { q: data[0].q, a: data[0].a };
             dailyCacheTime = now;
+            consecutiveFailures = 0; // Reset on success
             return NextResponse.json(cachedDailyQuote);
         }
     } catch (e) {
-        console.error('Daily quote fetch failed:', e);
+        consecutiveFailures = Math.min(consecutiveFailures + 1, 5);
+        console.error(`Daily quote fetch failed (attempt backoff: ${consecutiveFailures}):`, e);
     }
 
-    return NextResponse.json(getRandomFallback());
+    return NextResponse.json(cachedDailyQuote || getRandomFallback());
 }
 
 async function fetchBatchQuotes() {
     const now = Date.now();
-    if (cachedBatchQuotes.length > 0 && (now - batchCacheTime) < BATCH_CACHE_DURATION) {
+    const cacheDuration = getBackoffDuration(BATCH_CACHE_DURATION);
+    if (cachedBatchQuotes.length > 0 && (now - batchCacheTime) < cacheDuration) {
         return NextResponse.json(cachedBatchQuotes);
     }
 
@@ -83,7 +96,7 @@ async function fetchBatchQuotes() {
             next: { revalidate: 1800 },
         });
 
-        if (!response.ok) throw new Error('ZenQuotes API error');
+        if (!response.ok) throw new Error(`ZenQuotes API error: ${response.status}`);
         const data = await response.json();
 
         if (data && data.length > 0) {
@@ -91,13 +104,15 @@ async function fetchBatchQuotes() {
                 .filter((q: { q: string; a: string }) => q.q && q.a)
                 .map((q: { q: string; a: string }) => ({ q: q.q, a: q.a }));
             batchCacheTime = now;
+            consecutiveFailures = 0; // Reset on success
             return NextResponse.json(cachedBatchQuotes);
         }
     } catch (e) {
-        console.error('Batch quotes fetch failed:', e);
+        consecutiveFailures = Math.min(consecutiveFailures + 1, 5);
+        console.error(`Batch quotes fetch failed (attempt backoff: ${consecutiveFailures}):`, e);
     }
 
-    return NextResponse.json(fallbackQuotes);
+    return NextResponse.json(cachedBatchQuotes.length > 0 ? cachedBatchQuotes : fallbackQuotes);
 }
 
 async function fetchRandomQuote() {
@@ -106,7 +121,7 @@ async function fetchRandomQuote() {
             cache: 'no-store',
         });
 
-        if (!response.ok) throw new Error('ZenQuotes API error');
+        if (!response.ok) throw new Error(`ZenQuotes API error: ${response.status}`);
         const data = await response.json();
 
         if (data && data.length > 0 && data[0].q) {

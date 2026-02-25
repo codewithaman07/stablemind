@@ -134,7 +134,7 @@ export default function Visualization({ onBack }: VisualizationProps) {
 
     if (isActive && selectedScene) {
         const step = selectedScene.steps[currentStep];
-        const progress = ((currentStep * 100) + ((selectedScene.steps[currentStep].duration - timeLeft) / selectedScene.steps[currentStep].duration) * 100) / selectedScene.steps.length;
+        const progress = Math.min(100, ((currentStep * 100) + ((selectedScene.steps[currentStep].duration - timeLeft) / selectedScene.steps[currentStep].duration) * 100) / selectedScene.steps.length);
 
         return (
             <div className="p-4 sm:p-8 flex flex-col items-center">

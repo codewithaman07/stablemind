@@ -52,9 +52,9 @@ export default function DashboardLayout({
 
   const toggleLeftSidebar = () => setLeftSidebarOpen(!leftSidebarOpen);
 
-  // Use relative widths: ~16vw open (clamped 13rem–17rem), ~4.25rem collapsed
+  // Use relative widths: ~14vw open (clamped 13rem–17rem), ~4.25rem collapsed
   const sidebarWidth = leftSidebarOpen
-    ? (isMobile ? '80vw' : 'clamp(13rem, 16vw, 17rem)')
+    ? (isMobile ? '80vw' : 'clamp(13rem, 14vw, 17rem)')
     : (isMobile ? '0px' : '4.25rem');
 
   return (

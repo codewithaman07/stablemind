@@ -62,7 +62,10 @@ CREATE TABLE IF NOT EXISTS user_stats (
 CREATE INDEX idx_user_stats_user ON user_stats(user_id);
 
 -- ═══════════════════════════════════════════════════════════════════
--- Row Level Security (RLS) — ensures users can only access their own data
+-- Row Level Security (RLS)
+-- Uses Clerk JWT: the 'sub' claim contains the Clerk user ID.
+-- To integrate, configure Supabase to verify Clerk JWTs:
+--   Dashboard → Settings → API → JWT Secret → set to your Clerk JWT secret
 -- ═══════════════════════════════════════════════════════════════════
 
 -- Enable RLS on all tables
@@ -72,12 +75,16 @@ ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE saved_quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_stats ENABLE ROW LEVEL SECURITY;
 
--- For now, allow all operations via the anon key (since we use Clerk for auth,
--- user_id filtering is handled in the application layer).
--- You can tighten these policies later with JWT-based RLS if needed.
+-- NOTE: These policies use permissive rules for now since Clerk IDs (not Supabase Auth)
+-- are used as user_id. User isolation is enforced at the application layer via Clerk.
+-- To fully secure with RLS, integrate Clerk JWTs with Supabase and use:
+--   (auth.jwt() ->> 'sub') = user_id
+-- For production, consider migrating DB calls to server-side API routes
+-- so the anon key is never exposed to the client.
 
 CREATE POLICY "Allow all for mood_entries" ON mood_entries FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for chat_sessions" ON chat_sessions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for chat_messages" ON chat_messages FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for saved_quotes" ON saved_quotes FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for user_stats" ON user_stats FOR ALL USING (true) WITH CHECK (true);
+
