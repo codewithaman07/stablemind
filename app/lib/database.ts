@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase, getSupabase } from './supabase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export interface MoodEntryDB {
@@ -289,13 +289,14 @@ export interface PeerReplyDB {
     created_at?: string;
 }
 
-export async function createPeerPost(userId: string, content: string, category = 'general') {
+export async function createPeerPost(userId: string, content: string, category = 'general', token?: string) {
+    const client = getSupabase(token);
     // Server-side validation
     const trimmed = content.trim();
     if (!trimmed || trimmed.length < 2) throw new Error('Post content is too short');
     if (trimmed.length > 1000) throw new Error('Post content exceeds 1000 characters');
 
-    const { data, error } = await supabase
+    const { data, error } = await client
         .from('peer_posts')
         .insert({ user_id: userId, content: trimmed, category })
         .select()
@@ -305,8 +306,9 @@ export async function createPeerPost(userId: string, content: string, category =
     return data;
 }
 
-export async function getPeerPosts(userId: string, category?: string, limit = 30) {
-    let query = supabase
+export async function getPeerPosts(userId: string, category?: string, limit = 30, token?: string) {
+    const client = getSupabase(token);
+    let query = client
         .from('peer_posts')
         .select('*')
         .order('created_at', { ascending: false })
@@ -322,7 +324,7 @@ export async function getPeerPosts(userId: string, category?: string, limit = 30
 
     // Get reply counts
     const postIds = posts.map((p: PeerPostDB) => p.id!);
-    const { data: replies } = await supabase
+    const { data: replies } = await client
         .from('peer_replies')
         .select('post_id')
         .in('post_id', postIds);
@@ -333,7 +335,7 @@ export async function getPeerPosts(userId: string, category?: string, limit = 30
     });
 
     // Check which posts this user has supported
-    const { data: supports } = await supabase
+    const { data: supports } = await client
         .from('peer_supports')
         .select('post_id')
         .eq('user_id', userId)
@@ -348,13 +350,14 @@ export async function getPeerPosts(userId: string, category?: string, limit = 30
     }));
 }
 
-export async function createPeerReply(userId: string, postId: string, content: string) {
+export async function createPeerReply(userId: string, postId: string, content: string, token?: string) {
+    const client = getSupabase(token);
     // Server-side validation
     const trimmed = content.trim();
     if (!trimmed || trimmed.length < 1) throw new Error('Reply content is empty');
     if (trimmed.length > 500) throw new Error('Reply content exceeds 500 characters');
 
-    const { data, error } = await supabase
+    const { data, error } = await client
         .from('peer_replies')
         .insert({ post_id: postId, user_id: userId, content: trimmed })
         .select()
@@ -364,8 +367,9 @@ export async function createPeerReply(userId: string, postId: string, content: s
     return data;
 }
 
-export async function getPeerReplies(postId: string) {
-    const { data, error } = await supabase
+export async function getPeerReplies(postId: string, token?: string) {
+    const client = getSupabase(token);
+    const { data, error } = await client
         .from('peer_replies')
         .select('*')
         .eq('post_id', postId)
@@ -375,9 +379,10 @@ export async function getPeerReplies(postId: string) {
     return data || [];
 }
 
-export async function toggleSupport(userId: string, postId: string): Promise<boolean> {
+export async function toggleSupport(userId: string, postId: string, token?: string): Promise<boolean> {
+    const client = getSupabase(token);
     // Check if already supported
-    const { data: existing } = await supabase
+    const { data: existing } = await client
         .from('peer_supports')
         .select('id')
         .eq('user_id', userId)
@@ -386,28 +391,20 @@ export async function toggleSupport(userId: string, postId: string): Promise<boo
 
     if (existing) {
         // Remove support
-        await supabase.from('peer_supports').delete().eq('id', existing.id);
+        await client.from('peer_supports').delete().eq('id', existing.id);
     } else {
         // Add support (unique constraint prevents duplicates)
-        await supabase.from('peer_supports').insert({ user_id: userId, post_id: postId });
+        await client.from('peer_supports').insert({ user_id: userId, post_id: postId });
     }
 
-    // Derive count from source of truth (peer_supports table) to avoid race conditions
-    const { count } = await supabase
-        .from('peer_supports')
-        .select('*', { count: 'exact', head: true })
-        .eq('post_id', postId);
-
-    await supabase
-        .from('peer_posts')
-        .update({ support_count: count || 0 })
-        .eq('id', postId);
+    // Update of support_count is handled by database trigger
 
     return !existing;
 }
 
-export async function deletePeerPost(userId: string, postId: string) {
-    const { error } = await supabase
+export async function deletePeerPost(userId: string, postId: string, token?: string) {
+    const client = getSupabase(token);
+    const { error } = await client
         .from('peer_posts')
         .delete()
         .eq('id', postId)
