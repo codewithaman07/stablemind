@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { logError } from '../lib/logger';
 import vectorDB from './vector_database.json';
 
 interface VectorDocument {
@@ -96,7 +97,7 @@ Please respond to the user's question with compassion and helpful information.`;
 
       return text;
     } catch (error) {
-      console.error('RAG Service Error:', error);
+      logError('RAG Service Error', error);
       throw new Error('Failed to process query. Please try again.');
     }
   }
