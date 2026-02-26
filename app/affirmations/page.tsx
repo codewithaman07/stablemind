@@ -8,9 +8,11 @@ import {
   saveQuote as saveQuoteToDB,
   getSavedQuotes as getSavedQuotesFromDB,
   deleteSavedQuote as deleteQuoteFromDB,
+} from '../lib/db/quotes';
+import {
   updateUserStats,
   incrementQuotesDiscovered,
-} from '../lib/database';
+} from '../lib/db/user';
 
 interface Quote {
   q: string;
