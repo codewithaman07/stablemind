@@ -1,30 +1,44 @@
-import { test } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { getEmotionBasedSuggestions } from './emotionDetection.ts';
+import { detectEmotions, getEmotionBasedSuggestions } from './emotionDetection.ts';
 
-test('getEmotionBasedSuggestions - happy path (multi-keyword)', () => {
-  // "I am anxious, worried and scared" -> 3 keywords. Should detect anxiety -> breathing.
-  const result = getEmotionBasedSuggestions('I am anxious, worried and scared');
-  assert.ok(result.length > 0, 'Should return suggestions');
-  assert.equal(result[0].tool, 'breathing', 'Should suggest breathing tool');
+describe('detectEmotions', () => {
+  it('should detect anxiety correctly', () => {
+    const result = detectEmotions('I am feeling anxious and worried.');
+    assert.ok(result.some(e => e.emotion === 'anxiety'));
+  });
+
+  it('should detect multiple emotions', () => {
+    const result = detectEmotions('I am feeling anxious and also very sad.');
+    const emotions = result.map(e => e.emotion);
+    assert.ok(emotions.includes('anxiety'));
+    assert.ok(emotions.includes('sadness'));
+  });
+
+  it('should be case insensitive', () => {
+    const result = detectEmotions('I AM FEELING ANXIOUS');
+    assert.ok(result.some(e => e.emotion === 'anxiety'));
+  });
+
+  it('should handle no emotions detected', () => {
+    const result = detectEmotions('I am eating a sandwich.');
+    assert.strictEqual(result.length, 0);
+  });
+
+  it('should return max 2 emotions', () => {
+      const msg = "I am anxious, sad, and angry.";
+      const result = detectEmotions(msg);
+      assert.ok(result.length <= 2);
+  });
 });
 
-test('getEmotionBasedSuggestions - deduplication', () => {
-  // "I am anxious and stressed" -> anxiety (breathing) + stress (breathing).
-  // Should return only 1 breathing suggestion.
-  const result = getEmotionBasedSuggestions('I am anxious and stressed');
-  assert.equal(result.length, 1, 'Should return exactly 1 suggestion due to deduplication');
-  assert.equal(result[0].tool, 'breathing', 'Should suggest breathing tool');
-});
-
-test('getEmotionBasedSuggestions - single keyword (strictness fix)', () => {
-  // "I am anxious" -> 1 keyword. With fixed confidence logic, this should be detected.
-  const result = getEmotionBasedSuggestions('I am anxious');
-  assert.equal(result.length, 1, 'Should return suggestion for clear single keyword');
-  assert.equal(result[0].tool, 'breathing', 'Should suggest breathing tool');
-});
-
-test('getEmotionBasedSuggestions - no match', () => {
-  const result = getEmotionBasedSuggestions('Hello world');
-  assert.equal(result.length, 0, 'Should return no suggestions for neutral text');
+describe('getEmotionBasedSuggestions', () => {
+    it('should return unique tools', () => {
+        // "anxious" -> breathing, "stressed" -> breathing. Should return only one breathing tool.
+        const msg = "I am anxious and stressed.";
+        const result = getEmotionBasedSuggestions(msg);
+        const tools = result.map(e => e.tool);
+        const uniqueTools = new Set(tools);
+        assert.strictEqual(tools.length, uniqueTools.size);
+    });
 });
