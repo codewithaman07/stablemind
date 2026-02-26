@@ -16,7 +16,7 @@
 
 ## Tech Stack
 
-- **Frontend**: [Next.js 14](https://nextjs.org/) (App Router), [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/)
+- **Frontend**: [Next.js 15.5.12](https://nextjs.org/) (App Router), [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/)
 - **Backend & Database**: [Supabase](https://supabase.com/) (PostgreSQL, Auth integration)
 - **Authentication**: [Clerk](https://clerk.com/)
 - **AI Integration**: [Google Gemini API](https://ai.google.dev/)
