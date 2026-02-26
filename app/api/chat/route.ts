@@ -3,6 +3,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { detectCrisis, mentalHealthHelplines } from '../../services/crisisDetection';
 import { getEmotionBasedSuggestions } from '../../services/emotionDetection';
 import { retrieveRelevantContent } from '../../services/ragService';
+import { rateLimit } from '../../lib/rate-limit';
+import { auth } from '@clerk/nextjs/server';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -41,6 +43,19 @@ instead of markdown syntax, as the text will be rendered as HTML.`;
 
 export async function POST(req: NextRequest) {
     try {
+        const { userId } = await auth();
+        const forwardedFor = req.headers.get('x-forwarded-for');
+        const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
+        const identifier = userId ?? ip;
+
+        const { success } = rateLimit(identifier, 10, 60 * 1000); // 10 requests per minute
+        if (!success) {
+            return NextResponse.json(
+                { error: 'Too many requests. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
         const { message, chatHistory = [] } = await req.json();
 
         if (!message || typeof message !== 'string') {
