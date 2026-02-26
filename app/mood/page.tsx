@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useUser } from '@clerk/nextjs';
 import { ChatProvider } from '../context/ChatContext';
-import { saveMoodEntry as saveMoodToDB, getMoodEntries, MoodEntryDB } from '../lib/database';
+import { saveMoodEntry as saveMoodToDB, getMoodEntries, MoodEntryDB } from '../lib/db/mood';
 
 interface MoodEntry {
   date: string;
