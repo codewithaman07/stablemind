@@ -11,7 +11,7 @@ import {
   deleteChatSession,
   updateChatSessionTitle,
   ChatSessionDB,
-} from '../lib/database';
+} from '../lib/db/chat';
 
 interface Message {
   role: string;
@@ -49,6 +49,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const hasLoadedRef = useRef(false);
+  const chatSessionsRef = useRef(chatSessions);
+
+  useEffect(() => {
+    chatSessionsRef.current = chatSessions;
+  }, [chatSessions]);
 
   // Load chat sessions + auto-resume most recent session on mount
   useEffect(() => {
@@ -130,6 +135,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     if (!userId) return;
 
     let sessionId = currentSessionId;
+    let isNewSession = false;
 
     // Auto-create a session if none exists
     if (!sessionId) {
@@ -137,6 +143,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         const session = await createChatSession(userId);
         sessionId = session.id;
         setCurrentSessionId(sessionId);
+        isNewSession = true;
 
         // Save the bot greeting first
         await saveChatMessage({
@@ -160,13 +167,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       // Auto-title the session after the first user message
       if (role === 'user') {
         const title = content.length > 40 ? content.substring(0, 40) + '…' : content;
-        try {
-          await updateChatSessionTitle(sessionId!, title);
-          setChatSessions(prev =>
-            prev.map(s => s.id === sessionId ? { ...s, title } : s)
-          );
-        } catch {
-          // Non-critical, ignore
+        const currentSession = chatSessionsRef.current.find(s => s.id === sessionId);
+
+        if (isNewSession || (currentSession && currentSession.title === 'New Chat')) {
+          try {
+            await updateChatSessionTitle(sessionId!, title);
+            setChatSessions(prev =>
+              prev.map(s => s.id === sessionId ? { ...s, title } : s)
+            );
+          } catch {
+            // Non-critical, ignore
+          }
         }
       }
     } catch (err) {

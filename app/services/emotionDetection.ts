@@ -126,7 +126,7 @@ export function detectEmotions(message: string): DetectedEmotion[] {
 
     if (matchedKeywords.length > 0) {
       // Calculate confidence based on number of matched keywords and message length
-      const confidence = Math.min(
+      const confidence = Math.max(
         (matchedKeywords.length / config.keywords.length) * 100,
         (matchedKeywords.length / message.split(' ').length) * 100
       );

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logError } from '../../lib/logger';
 
 // Cache quotes server-side
 let cachedDailyQuote: { q: string; a: string } | null = null;
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
     } catch (error) {
-        console.error('Quote API error:', error);
+        logError('Quote API error', error);
         return NextResponse.json(getRandomFallback());
     }
 }
@@ -78,7 +79,7 @@ async function fetchDailyQuote() {
         }
     } catch (e) {
         consecutiveFailures = Math.min(consecutiveFailures + 1, 5);
-        console.error(`Daily quote fetch failed (attempt backoff: ${consecutiveFailures}):`, e);
+        logError(`Daily quote fetch failed (attempt backoff: ${consecutiveFailures})`, e);
     }
 
     return NextResponse.json(cachedDailyQuote || getRandomFallback());
@@ -109,7 +110,7 @@ async function fetchBatchQuotes() {
         }
     } catch (e) {
         consecutiveFailures = Math.min(consecutiveFailures + 1, 5);
-        console.error(`Batch quotes fetch failed (attempt backoff: ${consecutiveFailures}):`, e);
+        logError(`Batch quotes fetch failed (attempt backoff: ${consecutiveFailures})`, e);
     }
 
     return NextResponse.json(cachedBatchQuotes.length > 0 ? cachedBatchQuotes : fallbackQuotes);
@@ -128,7 +129,7 @@ async function fetchRandomQuote() {
             return NextResponse.json({ q: data[0].q, a: data[0].a });
         }
     } catch (e) {
-        console.error('Random quote fetch failed:', e);
+        logError('Random quote fetch failed', e);
     }
 
     return NextResponse.json(getRandomFallback());
