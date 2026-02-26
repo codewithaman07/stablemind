@@ -1,4 +1,4 @@
-import { PeerPostDB } from '../lib/database';
+import { PeerPostDB } from '../lib/db/peer';
 import { CATEGORIES, getAnonymousIdentity, timeAgo } from '../lib/community';
 
 export default function PostCard({
