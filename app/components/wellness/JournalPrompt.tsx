@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { chatWithGemini } from '../../services/geminiService';
+import { sanitizeHtml } from '../../utils/security';
 
 interface JournalPromptProps {
   onBack: () => void;
@@ -183,7 +184,7 @@ Format your response with simple HTML formatting for readability.`;
               <div
                 className="text-sm chat-message"
                 style={{ color: 'var(--text-secondary)' }}
-                dangerouslySetInnerHTML={{ __html: suggestions }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(suggestions) }}
               />
             </div>
 
