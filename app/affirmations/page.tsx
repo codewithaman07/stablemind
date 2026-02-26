@@ -208,6 +208,8 @@ export default function AffirmationsPage() {
   const drawNextCard = useCallback(() => {
     if (quoteDeck.length === 0) return;
 
+    if (isFlipping) return;
+
     setIsFlipping(true);
     setShowSparkle(true);
 
@@ -224,7 +226,7 @@ export default function AffirmationsPage() {
 
     setTimeout(() => setIsFlipping(false), 600);
     setTimeout(() => setShowSparkle(false), 1200);
-  }, [currentCardIndex, quoteDeck.length]);
+  }, [currentCardIndex, quoteDeck.length, isFlipping]);
 
   const saveQuote = async (quote: Quote) => {
     const exists = savedQuotes.some(q => q.q === quote.q);
