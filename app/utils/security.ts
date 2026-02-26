@@ -1,12 +1,26 @@
-import DOMPurify from 'isomorphic-dompurify';
+import type DOMPurifyType from 'dompurify';
+
+let DOMPurify: DOMPurifyType | null = null;
+
+function getDOMPurify(): DOMPurifyType {
+  if (!DOMPurify) {
+    // Lazy-load DOMPurify only in environments where it's actually used.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const dompurifyModule = require('dompurify');
+    DOMPurify = (dompurifyModule.default || dompurifyModule) as DOMPurifyType;
+  }
+  return DOMPurify;
+}
 
 export function sanitizeHtml(html: string): string {
-  // Use isomorphic-dompurify for consistent sanitization on both server and client.
-  // This avoids hydration mismatches and ensures server-rendered content is safe without relying on weak regex.
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      'b', 'i', 'em', 'strong', 'p', 'div', 'span', 'ul', 'ol', 'li', 'br', 'a',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre'
+  if (typeof window === 'undefined') {
+    // SSR: Strip all tags to be safe and avoid hydration mismatches
+    return html.replace(/<[^>]*>?/gm, '');
+  }
+
+  const domPurifyInstance = getDOMPurify();
+
+  return domPurifyInstance.sanitize(html, {
     ],
     ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
   });
