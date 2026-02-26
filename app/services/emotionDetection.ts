@@ -1,4 +1,4 @@
-import { WellnessTool } from '../components/wellness/WellnessToolsConfig';
+import type { WellnessTool } from '../components/wellness/WellnessToolsConfig';
 
 // Define emotion types and their corresponding keywords
 export type EmotionType = 'anxiety' | 'stress' | 'sadness' | 'anger' | 'overwhelmed' | 'lonely' | 'tired' | 'grateful' | 'excited';
@@ -121,7 +121,7 @@ export function detectEmotions(message: string): DetectedEmotion[] {
   // Check each emotion type
   Object.entries(emotionMap).forEach(([emotionType, config]) => {
     const matchedKeywords = config.keywords.filter(keyword =>
-      lowercaseMessage.includes(keyword.toLowerCase())
+      lowercaseMessage.includes(keyword)
     );
 
     if (matchedKeywords.length > 0) {
