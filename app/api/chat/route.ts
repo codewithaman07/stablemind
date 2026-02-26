@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { detectCrisis, mentalHealthHelplines } from '../../services/crisisDetection';
 import { getEmotionBasedSuggestions } from '../../services/emotionDetection';
 import { retrieveRelevantContent } from '../../services/ragService';
+import { logError } from '../../lib/logger';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -122,7 +123,7 @@ ${isCrisisMessage ? 'IMPORTANT: This seems like a crisis situation. Begin your r
             detectedEmotions,
         });
     } catch (error) {
-        console.error('Chat API Error:', error);
+        logError('Chat API Error', error);
 
         const message = (await (async () => {
             try {

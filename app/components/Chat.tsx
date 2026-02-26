@@ -6,6 +6,7 @@ import { detectCrisis, mentalHealthHelplines } from "../services/crisisDetection
 import { DetectedEmotion } from "../services/emotionDetection";
 import { useChatContext } from "../context/ChatContext";
 import Logo from "./Logo";
+import { sanitizeHtml } from "../utils/security";
 
 export default function Chat() {
   const { messages, setMessages, persistMessage } = useChatContext();
@@ -137,7 +138,7 @@ export default function Chat() {
                   }
                 >
                   {message.role === "bot" || message.role === "alert" ? (
-                    <div dangerouslySetInnerHTML={{ __html: message.content }} className="prose prose-invert max-w-none" />
+                    <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(message.content) }} className="prose prose-invert max-w-none" />
                   ) : (
                     message.content
                   )}
