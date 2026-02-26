@@ -1,16 +1,4 @@
-import type DOMPurifyType from 'dompurify';
-
-let DOMPurify: DOMPurifyType | null = null;
-
-function getDOMPurify(): DOMPurifyType {
-  if (!DOMPurify) {
-    // Lazy-load DOMPurify only in environments where it's actually used.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const dompurifyModule = require('dompurify');
-    DOMPurify = (dompurifyModule.default || dompurifyModule) as DOMPurifyType;
-  }
-  return DOMPurify;
-}
+import DOMPurify from 'isomorphic-dompurify';
 
 export function sanitizeHtml(html: string): string {
   if (typeof window === 'undefined') {
@@ -18,10 +6,7 @@ export function sanitizeHtml(html: string): string {
     return html.replace(/<[^>]*>?/gm, '');
   }
 
-  const domPurifyInstance = getDOMPurify();
-
-  return domPurifyInstance.sanitize(html, {
-    ],
+  return DOMPurify.sanitize(html, {
     ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
   });
 }

@@ -1,6 +1,6 @@
-import { test, describe, it } from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert';
-import { sanitizeHtml } from './security.ts'; // Explicit extension
+import { sanitizeHtml } from './security'; // Explicit extension
 
 test('sanitizeHtml SSR behavior', () => {
   const input = '<script>alert("xss")</script><b>Hello</b>';

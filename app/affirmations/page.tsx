@@ -54,6 +54,48 @@ export default function AffirmationsPage() {
 
   const greeting = getGreeting();
 
+
+  const fetchDailyQuote = useCallback(async () => {
+    setIsLoadingDaily(true);
+    try {
+      const res = await fetch('/api/quote?mode=today');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.q) {
+          setDailyQuote(data);
+          setIsLoadingDaily(false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch daily quote:', e);
+    }
+    setDailyQuote({ q: "Every day is a new beginning. Take a deep breath, smile, and start again.", a: "Unknown" });
+    setIsLoadingDaily(false);
+  }, []);
+
+  const fetchQuoteDeck = useCallback(async () => {
+    setIsLoadingDeck(true);
+    try {
+      const res = await fetch('/api/quote?mode=quotes');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          // Shuffle the deck
+          const shuffled = [...data].sort(() => Math.random() - 0.5);
+          setQuoteDeck(shuffled);
+          setCurrentCardIndex(0);
+          if (userId) { incrementQuotesDiscovered(userId, 1).then(n => setTotalDiscovered(n)).catch(() => { }); }
+          setIsLoadingDeck(false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch quote deck:', e);
+    }
+    setIsLoadingDeck(false);
+  }, [userId]);
+
   // Initialize state from Supabase
   useEffect(() => {
     async function init() {
@@ -75,48 +117,7 @@ export default function AffirmationsPage() {
       fetchQuoteDeck();
     }
     init();
-  }, [userId]);
-
-  const fetchDailyQuote = async () => {
-    setIsLoadingDaily(true);
-    try {
-      const res = await fetch('/api/quote?mode=today');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.q) {
-          setDailyQuote(data);
-          setIsLoadingDaily(false);
-          return;
-        }
-      }
-    } catch (e) {
-      console.error('Failed to fetch daily quote:', e);
-    }
-    setDailyQuote({ q: "Every day is a new beginning. Take a deep breath, smile, and start again.", a: "Unknown" });
-    setIsLoadingDaily(false);
-  };
-
-  const fetchQuoteDeck = async () => {
-    setIsLoadingDeck(true);
-    try {
-      const res = await fetch('/api/quote?mode=quotes');
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          // Shuffle the deck
-          const shuffled = [...data].sort(() => Math.random() - 0.5);
-          setQuoteDeck(shuffled);
-          setCurrentCardIndex(0);
-          if (userId) { incrementQuotesDiscovered(userId, 1).then(n => setTotalDiscovered(n)).catch(() => { }); }
-          setIsLoadingDeck(false);
-          return;
-        }
-      }
-    } catch (e) {
-      console.error('Failed to fetch quote deck:', e);
-    }
-    setIsLoadingDeck(false);
-  };
+  }, [userId, fetchDailyQuote, fetchQuoteDeck]);
 
   const currentCard = quoteDeck[currentCardIndex] || null;
 
@@ -141,7 +142,7 @@ export default function AffirmationsPage() {
 
     setTimeout(() => setIsFlipping(false), 600);
     setTimeout(() => setShowSparkle(false), 1200);
-  }, [currentCardIndex, quoteDeck.length, isFlipping]);
+  }, [currentCardIndex, quoteDeck.length, isFlipping, fetchQuoteDeck, userId]);
 
   const saveQuote = async (quote: Quote) => {
     const exists = savedQuotes.some(q => q.q === quote.q);

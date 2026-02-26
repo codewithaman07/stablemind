@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useUser } from '@clerk/nextjs';
 import { ChatProvider } from '../context/ChatContext';
@@ -12,7 +12,7 @@ import {
     toggleSupport,
     PeerPostDB,
     PeerReplyDB,
-} from '../lib/database';
+} from '../lib/db/peer';
 import PostCard from '../components/PostCard';
 import { CATEGORIES, getAnonymousIdentity, timeAgo } from '../lib/community';
 
@@ -189,7 +189,7 @@ function PeerSupportContent() {
     const [activeThread, setActiveThread] = useState<PeerPostDB | null>(null);
     const [showCompose, setShowCompose] = useState(false);
 
-    const loadPosts = async (category?: string) => {
+    const loadPosts = useCallback(async (category?: string) => {
         setIsLoading(true);
         try {
             const data = await getPeerPosts(userId, category || activeCategory);
@@ -199,11 +199,11 @@ function PeerSupportContent() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [userId, activeCategory]);
 
     useEffect(() => {
         loadPosts();
-    }, [activeCategory, userId]);
+    }, [loadPosts]);
 
     const handlePost = async () => {
         if (!newPost.trim() || isPosting || userId === 'guest') return;
@@ -238,7 +238,7 @@ function PeerSupportContent() {
             }));
             // Also update active thread if open
             if (activeThread?.id === postId) {
-                setActiveThread(prev => prev ? {
+                setActiveThread((prev: PeerPostDB | null) => prev ? {
                     ...prev,
                     user_has_supported: isNowSupported,
                     support_count: isNowSupported

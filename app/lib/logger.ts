@@ -17,7 +17,7 @@ export function sanitizeValue(value: unknown, seen = new WeakSet()): unknown {
     }
     // Redact JWTs (start with eyJ and are long)
     if (value.startsWith('eyJ') && value.length > 50 && !value.includes(' ')) {
-        return '[REDACTED_JWT]';
+      return '[REDACTED_JWT]';
     }
     return value;
   }
@@ -29,23 +29,23 @@ export function sanitizeValue(value: unknown, seen = new WeakSet()): unknown {
     seen.add(value as object);
 
     if (value instanceof Error) {
-        const err = value as any;
-        const sanitized: Record<string, unknown> = {
-            name: err.name,
-            message: err.message,
-            stack: err.stack,
-        };
-        // Copy other properties
-        for (const key of Object.getOwnPropertyNames(err)) {
-             if (key !== 'name' && key !== 'message' && key !== 'stack') {
-                if (isSensitiveKey(key)) {
-                    sanitized[key] = '[REDACTED]';
-                } else {
-                    sanitized[key] = sanitizeValue(err[key], seen);
-                }
-             }
+      const err = value as Error & Record<string, unknown>;
+      const sanitized: Record<string, unknown> = {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+      };
+      // Copy other properties
+      for (const key of Object.getOwnPropertyNames(err)) {
+        if (key !== 'name' && key !== 'message' && key !== 'stack') {
+          if (isSensitiveKey(key)) {
+            sanitized[key] = '[REDACTED]';
+          } else {
+            sanitized[key] = sanitizeValue(err[key], seen);
+          }
         }
-        return sanitized;
+      }
+      return sanitized;
     }
 
     if (Array.isArray(value)) {
@@ -58,7 +58,7 @@ export function sanitizeValue(value: unknown, seen = new WeakSet()): unknown {
         if (isSensitiveKey(key)) {
           sanitized[key] = '[REDACTED]';
         } else {
-          sanitized[key] = sanitizeValue((value as any)[key], seen);
+          sanitized[key] = sanitizeValue((value as Record<string, unknown>)[key], seen);
         }
       }
     }
