@@ -137,7 +137,7 @@ ${isCrisisMessage ? 'IMPORTANT: This seems like a crisis situation. Begin your r
             detectedEmotions,
         });
     } catch (error) {
-        console.error('Chat API Error:', error);
+        logError('Chat API Error', error);
 
         const message = (await (async () => {
             try {

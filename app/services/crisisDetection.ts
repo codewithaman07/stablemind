@@ -4,9 +4,12 @@ const crisisKeywords = [
   'taking my life', 'harm myself', 'hurt myself', 'self-harm', 'death wish',
 ];
 
+// Create a regex pattern that matches any of the keywords as whole words/phrases
+// We escape special regex characters in keywords and use \b for word boundaries
+const crisisRegex = new RegExp(`\\b(${crisisKeywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'i');
+
 export function detectCrisis(message: string): boolean {
-  const lowercaseMessage = message.toLowerCase();
-  return crisisKeywords.some(keyword => lowercaseMessage.includes(keyword));
+  return crisisRegex.test(message);
 }
 
 // Mental health helplines in HTML format
@@ -20,5 +23,3 @@ export const mentalHealthHelplines = `
   <br/><br/><b>You are not alone. Help is available. Your life matters.</b>
 </div>
 `;
-
-
