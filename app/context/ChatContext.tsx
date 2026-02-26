@@ -11,7 +11,7 @@ import {
   deleteChatSession,
   updateChatSessionTitle,
   ChatSessionDB,
-} from '../lib/database';
+} from '../lib/db/chat';
 
 interface Message {
   role: string;
