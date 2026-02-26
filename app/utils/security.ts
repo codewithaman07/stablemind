@@ -1,11 +1,8 @@
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function sanitizeHtml(html: string): string {
-  if (typeof window === 'undefined') {
-    // SSR: Strip all tags to be safe and avoid hydration mismatches
-    return html.replace(/<[^>]*>?/gm, '');
-  }
-
+  // Use isomorphic-dompurify for consistent sanitization on both server and client.
+  // This avoids hydration mismatches and ensures server-rendered content is safe without relying on weak regex.
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
       'b', 'i', 'em', 'strong', 'p', 'div', 'span', 'ul', 'ol', 'li', 'br', 'a',

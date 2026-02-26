@@ -4,7 +4,10 @@ import { sanitizeHtml } from './security.ts'; // Explicit extension
 
 test('sanitizeHtml SSR behavior', () => {
   const input = '<script>alert("xss")</script><b>Hello</b>';
-  const expected = 'alert("xss")Hello';
+  // With isomorphic-dompurify, the output should be consistent with client-side sanitization.
+  // <script> -> "" (entire tag and content stripped or just tag?)
+  // dompurify default behavior removes script tags entirely, including content.
+  const expected = '<b>Hello</b>';
   const actual = sanitizeHtml(input);
   assert.strictEqual(actual, expected);
 });
