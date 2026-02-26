@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase, createClerkSupabaseClient } from './supabase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export interface MoodEntryDB {
@@ -44,9 +44,13 @@ export interface UserStatsDB {
     quotes_discovered: number;
 }
 
+// Helper to get client
+const getClient = (token?: string) => token ? createClerkSupabaseClient(token) : supabase;
+
 // ─── Mood Entries ────────────────────────────────────────────────────────────
-export async function saveMoodEntry(entry: Omit<MoodEntryDB, 'id' | 'created_at'>) {
-    const { data, error } = await supabase
+export async function saveMoodEntry(entry: Omit<MoodEntryDB, 'id' | 'created_at'>, token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('mood_entries')
         .insert(entry)
         .select()
@@ -56,8 +60,9 @@ export async function saveMoodEntry(entry: Omit<MoodEntryDB, 'id' | 'created_at'
     return data;
 }
 
-export async function getMoodEntries(userId: string, limit = 10) {
-    const { data, error } = await supabase
+export async function getMoodEntries(userId: string, limit = 10, token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('mood_entries')
         .select('*')
         .eq('user_id', userId)
@@ -69,8 +74,9 @@ export async function getMoodEntries(userId: string, limit = 10) {
 }
 
 // ─── Chat Sessions ───────────────────────────────────────────────────────────
-export async function createChatSession(userId: string, title = 'New Chat') {
-    const { data, error } = await supabase
+export async function createChatSession(userId: string, title = 'New Chat', token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('chat_sessions')
         .insert({ user_id: userId, title })
         .select()
@@ -80,8 +86,9 @@ export async function createChatSession(userId: string, title = 'New Chat') {
     return data;
 }
 
-export async function getChatSessions(userId: string, limit = 20) {
-    const { data, error } = await supabase
+export async function getChatSessions(userId: string, limit = 20, token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('chat_sessions')
         .select('*')
         .eq('user_id', userId)
@@ -92,8 +99,9 @@ export async function getChatSessions(userId: string, limit = 20) {
     return data || [];
 }
 
-export async function updateChatSessionTitle(sessionId: string, title: string) {
-    const { error } = await supabase
+export async function updateChatSessionTitle(sessionId: string, title: string, token?: string) {
+    const client = getClient(token);
+    const { error } = await client
         .from('chat_sessions')
         .update({ title, updated_at: new Date().toISOString() })
         .eq('id', sessionId);
@@ -101,14 +109,15 @@ export async function updateChatSessionTitle(sessionId: string, title: string) {
     if (error) throw error;
 }
 
-export async function deleteChatSession(sessionId: string) {
+export async function deleteChatSession(sessionId: string, token?: string) {
+    const client = getClient(token);
     // Delete messages first
-    await supabase
+    await client
         .from('chat_messages')
         .delete()
         .eq('session_id', sessionId);
 
-    const { error } = await supabase
+    const { error } = await client
         .from('chat_sessions')
         .delete()
         .eq('id', sessionId);
@@ -117,8 +126,9 @@ export async function deleteChatSession(sessionId: string) {
 }
 
 // ─── Chat Messages ───────────────────────────────────────────────────────────
-export async function saveChatMessage(message: Omit<ChatMessageDB, 'id' | 'created_at'>) {
-    const { data, error } = await supabase
+export async function saveChatMessage(message: Omit<ChatMessageDB, 'id' | 'created_at'>, token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('chat_messages')
         .insert(message)
         .select()
@@ -127,7 +137,7 @@ export async function saveChatMessage(message: Omit<ChatMessageDB, 'id' | 'creat
     if (error) throw error;
 
     // Update session timestamp
-    await supabase
+    await client
         .from('chat_sessions')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', message.session_id);
@@ -135,8 +145,9 @@ export async function saveChatMessage(message: Omit<ChatMessageDB, 'id' | 'creat
     return data;
 }
 
-export async function getChatMessages(sessionId: string) {
-    const { data, error } = await supabase
+export async function getChatMessages(sessionId: string, token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('chat_messages')
         .select('*')
         .eq('session_id', sessionId)
@@ -147,9 +158,10 @@ export async function getChatMessages(sessionId: string) {
 }
 
 // ─── Saved Quotes ────────────────────────────────────────────────────────────
-export async function saveQuote(userId: string, quote: string, author: string) {
+export async function saveQuote(userId: string, quote: string, author: string, token?: string) {
+    const client = getClient(token);
     // Check if already saved
-    const { data: existing } = await supabase
+    const { data: existing } = await client
         .from('saved_quotes')
         .select('id')
         .eq('user_id', userId)
@@ -158,7 +170,7 @@ export async function saveQuote(userId: string, quote: string, author: string) {
 
     if (existing) return existing;
 
-    const { data, error } = await supabase
+    const { data, error } = await client
         .from('saved_quotes')
         .insert({ user_id: userId, quote, author })
         .select()
@@ -168,8 +180,9 @@ export async function saveQuote(userId: string, quote: string, author: string) {
     return data;
 }
 
-export async function getSavedQuotes(userId: string) {
-    const { data, error } = await supabase
+export async function getSavedQuotes(userId: string, token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('saved_quotes')
         .select('*')
         .eq('user_id', userId)
@@ -179,8 +192,9 @@ export async function getSavedQuotes(userId: string) {
     return data || [];
 }
 
-export async function deleteSavedQuote(userId: string, quote: string) {
-    const { error } = await supabase
+export async function deleteSavedQuote(userId: string, quote: string, token?: string) {
+    const client = getClient(token);
+    const { error } = await client
         .from('saved_quotes')
         .delete()
         .eq('user_id', userId)
@@ -190,8 +204,9 @@ export async function deleteSavedQuote(userId: string, quote: string) {
 }
 
 // ─── User Stats ──────────────────────────────────────────────────────────────
-export async function getUserStats(userId: string): Promise<UserStatsDB | null> {
-    const { data, error } = await supabase
+export async function getUserStats(userId: string, token?: string): Promise<UserStatsDB | null> {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('user_stats')
         .select('*')
         .eq('user_id', userId)
@@ -201,15 +216,16 @@ export async function getUserStats(userId: string): Promise<UserStatsDB | null> 
     return data;
 }
 
-export async function updateUserStats(userId: string): Promise<UserStatsDB> {
+export async function updateUserStats(userId: string, token?: string): Promise<UserStatsDB> {
+    const client = getClient(token);
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-    const existing = await getUserStats(userId);
+    const existing = await getUserStats(userId, token);
 
     if (!existing) {
         // First visit ever
-        const { data, error } = await supabase
+        const { data, error } = await client
             .from('user_stats')
             .insert({
                 user_id: userId,
@@ -235,7 +251,7 @@ export async function updateUserStats(userId: string): Promise<UserStatsDB> {
         newStreak = existing.streak + 1;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await client
         .from('user_stats')
         .update({ streak: newStreak, last_visit: today })
         .eq('user_id', userId)
@@ -246,17 +262,18 @@ export async function updateUserStats(userId: string): Promise<UserStatsDB> {
     return data;
 }
 
-export async function incrementQuotesDiscovered(userId: string, count = 1): Promise<number> {
-    const stats = await getUserStats(userId);
+export async function incrementQuotesDiscovered(userId: string, count = 1, token?: string): Promise<number> {
+    const client = getClient(token);
+    const stats = await getUserStats(userId, token);
     const newCount = (stats?.quotes_discovered || 0) + count;
 
     if (stats) {
-        await supabase
+        await client
             .from('user_stats')
             .update({ quotes_discovered: newCount })
             .eq('user_id', userId);
     } else {
-        await supabase
+        await client
             .from('user_stats')
             .insert({
                 user_id: userId,
@@ -289,13 +306,14 @@ export interface PeerReplyDB {
     created_at?: string;
 }
 
-export async function createPeerPost(userId: string, content: string, category = 'general') {
+export async function createPeerPost(userId: string, content: string, category = 'general', token?: string) {
+    const client = getClient(token);
     // Server-side validation
     const trimmed = content.trim();
     if (!trimmed || trimmed.length < 2) throw new Error('Post content is too short');
     if (trimmed.length > 1000) throw new Error('Post content exceeds 1000 characters');
 
-    const { data, error } = await supabase
+    const { data, error } = await client
         .from('peer_posts')
         .insert({ user_id: userId, content: trimmed, category })
         .select()
@@ -305,8 +323,9 @@ export async function createPeerPost(userId: string, content: string, category =
     return data;
 }
 
-export async function getPeerPosts(userId: string, category?: string, limit = 30) {
-    let query = supabase
+export async function getPeerPosts(userId: string, category?: string, limit = 30, token?: string) {
+    const client = getClient(token);
+    let query = client
         .from('peer_posts')
         .select('*')
         .order('created_at', { ascending: false })
@@ -322,7 +341,7 @@ export async function getPeerPosts(userId: string, category?: string, limit = 30
 
     // Get reply counts
     const postIds = posts.map((p: PeerPostDB) => p.id!);
-    const { data: replies } = await supabase
+    const { data: replies } = await client
         .from('peer_replies')
         .select('post_id')
         .in('post_id', postIds);
@@ -333,7 +352,7 @@ export async function getPeerPosts(userId: string, category?: string, limit = 30
     });
 
     // Check which posts this user has supported
-    const { data: supports } = await supabase
+    const { data: supports } = await client
         .from('peer_supports')
         .select('post_id')
         .eq('user_id', userId)
@@ -348,13 +367,14 @@ export async function getPeerPosts(userId: string, category?: string, limit = 30
     }));
 }
 
-export async function createPeerReply(userId: string, postId: string, content: string) {
+export async function createPeerReply(userId: string, postId: string, content: string, token?: string) {
+    const client = getClient(token);
     // Server-side validation
     const trimmed = content.trim();
     if (!trimmed || trimmed.length < 1) throw new Error('Reply content is empty');
     if (trimmed.length > 500) throw new Error('Reply content exceeds 500 characters');
 
-    const { data, error } = await supabase
+    const { data, error } = await client
         .from('peer_replies')
         .insert({ post_id: postId, user_id: userId, content: trimmed })
         .select()
@@ -364,8 +384,9 @@ export async function createPeerReply(userId: string, postId: string, content: s
     return data;
 }
 
-export async function getPeerReplies(postId: string) {
-    const { data, error } = await supabase
+export async function getPeerReplies(postId: string, token?: string) {
+    const client = getClient(token);
+    const { data, error } = await client
         .from('peer_replies')
         .select('*')
         .eq('post_id', postId)
@@ -375,9 +396,10 @@ export async function getPeerReplies(postId: string) {
     return data || [];
 }
 
-export async function toggleSupport(userId: string, postId: string): Promise<boolean> {
+export async function toggleSupport(userId: string, postId: string, token?: string): Promise<boolean> {
+    const client = getClient(token);
     // Check if already supported
-    const { data: existing } = await supabase
+    const { data: existing } = await client
         .from('peer_supports')
         .select('id')
         .eq('user_id', userId)
@@ -386,19 +408,19 @@ export async function toggleSupport(userId: string, postId: string): Promise<boo
 
     if (existing) {
         // Remove support
-        await supabase.from('peer_supports').delete().eq('id', existing.id);
+        await client.from('peer_supports').delete().eq('id', existing.id);
     } else {
         // Add support (unique constraint prevents duplicates)
-        await supabase.from('peer_supports').insert({ user_id: userId, post_id: postId });
+        await client.from('peer_supports').insert({ user_id: userId, post_id: postId });
     }
 
     // Derive count from source of truth (peer_supports table) to avoid race conditions
-    const { count } = await supabase
+    const { count } = await client
         .from('peer_supports')
         .select('*', { count: 'exact', head: true })
         .eq('post_id', postId);
 
-    await supabase
+    await client
         .from('peer_posts')
         .update({ support_count: count || 0 })
         .eq('id', postId);
@@ -406,8 +428,9 @@ export async function toggleSupport(userId: string, postId: string): Promise<boo
     return !existing;
 }
 
-export async function deletePeerPost(userId: string, postId: string) {
-    const { error } = await supabase
+export async function deletePeerPost(userId: string, postId: string, token?: string) {
+    const client = getClient(token);
+    const { error } = await client
         .from('peer_posts')
         .delete()
         .eq('id', postId)
@@ -415,4 +438,3 @@ export async function deletePeerPost(userId: string, postId: string) {
 
     if (error) throw error;
 }
-

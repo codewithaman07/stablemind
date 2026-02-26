@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { ChatProvider } from '../context/ChatContext';
-import { useUser } from '@clerk/nextjs';
+import { useUser, useAuth } from '@clerk/nextjs';
 import {
   saveQuote as saveQuoteToDB,
   getSavedQuotes as getSavedQuotesFromDB,
@@ -122,6 +122,7 @@ function getGreeting(): { text: string; emoji: string } {
 // ─── Main Component ──────────────────────────────────────────────────────────
 export default function AffirmationsPage() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const userId = user?.id || null;
   const [dailyQuote, setDailyQuote] = useState<Quote | null>(null);
   const [quoteDeck, setQuoteDeck] = useState<Quote[]>([]);
@@ -139,30 +140,7 @@ export default function AffirmationsPage() {
 
   const greeting = getGreeting();
 
-  // Initialize state from Supabase
-  useEffect(() => {
-    async function init() {
-      if (userId) {
-        try {
-          // Update streak in DB
-          const stats = await updateUserStats(userId);
-          setStreak(stats.streak);
-          setTotalDiscovered(stats.quotes_discovered);
-
-          // Load saved quotes from DB
-          const quotes = await getSavedQuotesFromDB(userId);
-          setSavedQuotes(quotes.map(q => ({ q: q.quote, a: q.author, savedAt: new Date(q.saved_at || '').getTime() })));
-        } catch (err) {
-          console.error('Failed to load user data:', err);
-        }
-      }
-      fetchDailyQuote();
-      fetchQuoteDeck();
-    }
-    init();
-  }, [userId]);
-
-  const fetchDailyQuote = async () => {
+  const fetchDailyQuote = useCallback(async () => {
     setIsLoadingDaily(true);
     try {
       const res = await fetch('/api/quote?mode=today');
@@ -179,9 +157,9 @@ export default function AffirmationsPage() {
     }
     setDailyQuote({ q: "Every day is a new beginning. Take a deep breath, smile, and start again.", a: "Unknown" });
     setIsLoadingDaily(false);
-  };
+  }, []);
 
-  const fetchQuoteDeck = async () => {
+  const fetchQuoteDeck = useCallback(async () => {
     setIsLoadingDeck(true);
     try {
       const res = await fetch('/api/quote?mode=quotes');
@@ -192,7 +170,11 @@ export default function AffirmationsPage() {
           const shuffled = [...data].sort(() => Math.random() - 0.5);
           setQuoteDeck(shuffled);
           setCurrentCardIndex(0);
-          if (userId) { incrementQuotesDiscovered(userId, 1).then(n => setTotalDiscovered(n)).catch(() => { }); }
+          if (userId) {
+            getToken({ template: 'supabase' }).then(token => {
+              incrementQuotesDiscovered(userId, 1, token || undefined).then(n => setTotalDiscovered(n)).catch(() => { });
+            });
+          }
           setIsLoadingDeck(false);
           return;
         }
@@ -201,7 +183,31 @@ export default function AffirmationsPage() {
       console.error('Failed to fetch quote deck:', e);
     }
     setIsLoadingDeck(false);
-  };
+  }, [userId, getToken]);
+
+  // Initialize state from Supabase
+  useEffect(() => {
+    async function init() {
+      if (userId) {
+        try {
+          const token = await getToken({ template: 'supabase' }) || undefined;
+          // Update streak in DB
+          const stats = await updateUserStats(userId, token);
+          setStreak(stats.streak);
+          setTotalDiscovered(stats.quotes_discovered);
+
+          // Load saved quotes from DB
+          const quotes = await getSavedQuotesFromDB(userId, token);
+          setSavedQuotes(quotes.map(q => ({ q: q.quote, a: q.author, savedAt: new Date(q.saved_at || '').getTime() })));
+        } catch (err) {
+          console.error('Failed to load user data:', err);
+        }
+      }
+      fetchDailyQuote();
+      fetchQuoteDeck();
+    }
+    init();
+  }, [userId, getToken, fetchDailyQuote, fetchQuoteDeck]);
 
   const currentCard = quoteDeck[currentCardIndex] || null;
 
@@ -214,7 +220,11 @@ export default function AffirmationsPage() {
     setTimeout(() => {
       const nextIndex = (currentCardIndex + 1) % quoteDeck.length;
       setCurrentCardIndex(nextIndex);
-      if (userId) { incrementQuotesDiscovered(userId).then(n => setTotalDiscovered(n)).catch(() => { }); }
+      if (userId) {
+        getToken({ template: 'supabase' }).then(token => {
+          incrementQuotesDiscovered(userId, 1, token || undefined).then(n => setTotalDiscovered(n)).catch(() => { });
+        });
+      }
 
       // If we've cycled through all, fetch new deck
       if (nextIndex === 0) {
@@ -224,7 +234,7 @@ export default function AffirmationsPage() {
 
     setTimeout(() => setIsFlipping(false), 600);
     setTimeout(() => setShowSparkle(false), 1200);
-  }, [currentCardIndex, quoteDeck.length]);
+  }, [currentCardIndex, quoteDeck.length, userId, getToken, fetchQuoteDeck]);
 
   const saveQuote = async (quote: Quote) => {
     const exists = savedQuotes.some(q => q.q === quote.q);
@@ -236,7 +246,10 @@ export default function AffirmationsPage() {
     setTimeout(() => setJustSaved(false), 1500);
 
     if (userId) {
-      try { await saveQuoteToDB(userId, quote.q, quote.a); } catch (err) { console.error('Failed to save quote:', err); }
+      try {
+        const token = await getToken({ template: 'supabase' }) || undefined;
+        await saveQuoteToDB(userId, quote.q, quote.a, token);
+      } catch (err) { console.error('Failed to save quote:', err); }
     }
   };
 
@@ -244,7 +257,10 @@ export default function AffirmationsPage() {
     setSavedQuotes(prev => prev.filter(q => q.q !== quoteText));
 
     if (userId) {
-      try { await deleteQuoteFromDB(userId, quoteText); } catch (err) { console.error('Failed to delete quote:', err); }
+      try {
+        const token = await getToken({ template: 'supabase' }) || undefined;
+        await deleteQuoteFromDB(userId, quoteText, token);
+      } catch (err) { console.error('Failed to delete quote:', err); }
     }
   };
 

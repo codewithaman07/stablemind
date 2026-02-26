@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { DetectedEmotion } from '../services/emotionDetection';
-import { useUser } from '@clerk/nextjs';
+import { useUser, useAuth } from '@clerk/nextjs';
 import {
   createChatSession,
   getChatSessions,
@@ -42,6 +42,7 @@ const INITIAL_MESSAGES: Message[] = [{
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const userId = user?.id || null;
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -58,7 +59,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     async function loadAndResume() {
       setIsLoadingSessions(true);
       try {
-        const sessions = await getChatSessions(userId!);
+        const token = await getToken({ template: 'supabase' }) || undefined;
+        const sessions = await getChatSessions(userId!, 20, token);
         setChatSessions(sessions);
 
         // Auto-load the most recent session (first one, since sorted by updated_at DESC)
@@ -66,7 +68,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           const latestSession = sessions[0];
           setIsLoadingMessages(true);
           try {
-            const msgs = await getChatMessages(latestSession.id!);
+            const msgs = await getChatMessages(latestSession.id!, token);
             if (msgs.length > 0) {
               setMessages(msgs.map(m => ({ role: m.role, content: m.content })));
               setCurrentSessionId(latestSession.id!);
@@ -85,7 +87,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
 
     loadAndResume();
-  }, [userId]);
+  }, [userId, getToken]);
 
   const startNewSession = useCallback(() => {
     setMessages(INITIAL_MESSAGES);
@@ -97,7 +99,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
     setIsLoadingMessages(true);
     try {
-      const msgs = await getChatMessages(sessionId);
+      const token = await getToken({ template: 'supabase' }) || undefined;
+      const msgs = await getChatMessages(sessionId, token);
       if (msgs.length > 0) {
         setMessages(msgs.map(m => ({ role: m.role, content: m.content })));
         setCurrentSessionId(sessionId);
@@ -107,13 +110,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoadingMessages(false);
     }
-  }, [userId]);
+  }, [userId, getToken]);
 
   const deleteSession = useCallback(async (sessionId: string) => {
     if (!userId) return;
 
     try {
-      await deleteChatSession(sessionId);
+      const token = await getToken({ template: 'supabase' }) || undefined;
+      await deleteChatSession(sessionId, token);
       setChatSessions(prev => prev.filter(s => s.id !== sessionId));
 
       // If we deleted the current session, start fresh
@@ -124,17 +128,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Failed to delete session:', err);
     }
-  }, [userId, currentSessionId]);
+  }, [userId, currentSessionId, getToken]);
 
   const persistMessage = useCallback(async (role: string, content: string) => {
     if (!userId) return;
 
     let sessionId = currentSessionId;
+    const token = await getToken({ template: 'supabase' }) || undefined;
 
     // Auto-create a session if none exists
     if (!sessionId) {
       try {
-        const session = await createChatSession(userId);
+        const session = await createChatSession(userId, undefined, token);
         sessionId = session.id;
         setCurrentSessionId(sessionId);
 
@@ -143,10 +148,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           session_id: sessionId!,
           role: 'bot',
           content: INITIAL_MESSAGES[0].content,
-        });
+        }, token);
 
         // Refresh sessions
-        const sessions = await getChatSessions(userId);
+        const sessions = await getChatSessions(userId, 20, token);
         setChatSessions(sessions);
       } catch (err) {
         console.error('Failed to auto-create session:', err);
@@ -155,13 +160,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      await saveChatMessage({ session_id: sessionId!, role, content });
+      await saveChatMessage({ session_id: sessionId!, role, content }, token);
 
       // Auto-title the session after the first user message
       if (role === 'user') {
         const title = content.length > 40 ? content.substring(0, 40) + '…' : content;
         try {
-          await updateChatSessionTitle(sessionId!, title);
+          await updateChatSessionTitle(sessionId!, title, token);
           setChatSessions(prev =>
             prev.map(s => s.id === sessionId ? { ...s, title } : s)
           );
@@ -172,7 +177,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Failed to persist message:', err);
     }
-  }, [userId, currentSessionId]);
+  }, [userId, currentSessionId, getToken]);
 
   const clearChatHistory = useCallback(() => {
     setMessages(INITIAL_MESSAGES);

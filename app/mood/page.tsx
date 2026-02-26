@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
-import { useUser } from '@clerk/nextjs';
+import { useUser, useAuth } from '@clerk/nextjs';
 import { ChatProvider } from '../context/ChatContext';
 import { saveMoodEntry as saveMoodToDB, getMoodEntries, MoodEntryDB } from '../lib/database';
 
@@ -25,6 +25,7 @@ const moodOptions = [
 
 function MoodContent() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const userId = user?.id || 'guest';
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState('');
@@ -42,7 +43,8 @@ function MoodContent() {
 
     async function loadHistory() {
       try {
-        const entries = await getMoodEntries(userId, 10);
+        const token = await getToken({ template: 'supabase' }) || undefined;
+        const entries = await getMoodEntries(userId, 10, token);
         setMoodHistory(entries.map((e: MoodEntryDB) => ({
           date: e.created_at || new Date().toISOString(),
           mood: e.mood,
@@ -59,7 +61,7 @@ function MoodContent() {
     }
 
     loadHistory();
-  }, [userId]);
+  }, [userId, getToken]);
 
   const saveMoodEntry = async () => {
     if (selectedMood === null) return;
@@ -88,6 +90,7 @@ function MoodContent() {
     // Persist to Supabase
     if (userId !== 'guest') {
       try {
+        const token = await getToken({ template: 'supabase' }) || undefined;
         await saveMoodToDB({
           user_id: userId,
           mood: newEntry.mood,
@@ -95,7 +98,7 @@ function MoodContent() {
           note: newEntry.note,
           emoji: newEntry.emoji,
           color: newEntry.color,
-        });
+        }, token);
       } catch (err) {
         console.error('Failed to save mood entry:', err);
       }

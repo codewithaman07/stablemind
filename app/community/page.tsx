@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
-import { useUser } from '@clerk/nextjs';
+import { useUser, useAuth } from '@clerk/nextjs';
 import { ChatProvider } from '../context/ChatContext';
 import {
     createPeerPost,
@@ -155,6 +155,7 @@ function ReplyThread({
     onClose: () => void;
     onSupportToggle: (postId: string) => void;
 }) {
+    const { getToken } = useAuth();
     const [replies, setReplies] = useState<PeerReplyDB[]>([]);
     const [replyText, setReplyText] = useState('');
     const [isSending, setIsSending] = useState(false);
@@ -164,7 +165,8 @@ function ReplyThread({
     useEffect(() => {
         async function load() {
             try {
-                const data = await getPeerReplies(post.id!);
+                const token = await getToken({ template: 'supabase' }) || undefined;
+                const data = await getPeerReplies(post.id!, token);
                 setReplies(data);
             } catch (err) {
                 console.error('Failed to load replies:', err);
@@ -173,7 +175,7 @@ function ReplyThread({
             }
         }
         load();
-    }, [post.id]);
+    }, [post.id, getToken]);
 
     useEffect(() => {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -183,7 +185,8 @@ function ReplyThread({
         if (!replyText.trim() || isSending) return;
         setIsSending(true);
         try {
-            const reply = await createPeerReply(userId, post.id!, replyText.trim());
+            const token = await getToken({ template: 'supabase' }) || undefined;
+            const reply = await createPeerReply(userId, post.id!, replyText.trim(), token);
             setReplies(prev => [...prev, reply]);
             setReplyText('');
         } catch (err) {
@@ -306,6 +309,7 @@ function ReplyThread({
 // ─── Main Page ──────────────────────────────────────────────────────────────
 function PeerSupportContent() {
     const { user } = useUser();
+    const { getToken } = useAuth();
     const userId = user?.id || 'guest';
     const [posts, setPosts] = useState<PeerPostDB[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -316,27 +320,29 @@ function PeerSupportContent() {
     const [activeThread, setActiveThread] = useState<PeerPostDB | null>(null);
     const [showCompose, setShowCompose] = useState(false);
 
-    const loadPosts = async (category?: string) => {
+    const loadPosts = useCallback(async (category?: string) => {
         setIsLoading(true);
         try {
-            const data = await getPeerPosts(userId, category || activeCategory);
+            const token = await getToken({ template: 'supabase' }) || undefined;
+            const data = await getPeerPosts(userId, category || activeCategory, undefined, token);
             setPosts(data);
         } catch (err) {
             console.error('Failed to load posts:', err);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [userId, activeCategory, getToken]);
 
     useEffect(() => {
         loadPosts();
-    }, [activeCategory, userId]);
+    }, [loadPosts]);
 
     const handlePost = async () => {
         if (!newPost.trim() || isPosting || userId === 'guest') return;
         setIsPosting(true);
         try {
-            const post = await createPeerPost(userId, newPost.trim(), newPostCategory);
+            const token = await getToken({ template: 'supabase' }) || undefined;
+            const post = await createPeerPost(userId, newPost.trim(), newPostCategory, token);
             setPosts(prev => [{ ...post, reply_count: 0, user_has_supported: false }, ...prev]);
             setNewPost('');
             setShowCompose(false);
@@ -350,7 +356,8 @@ function PeerSupportContent() {
     const handleSupportToggle = async (postId: string) => {
         if (userId === 'guest') return;
         try {
-            const isNowSupported = await toggleSupport(userId, postId);
+            const token = await getToken({ template: 'supabase' }) || undefined;
+            const isNowSupported = await toggleSupport(userId, postId, token);
             setPosts(prev => prev.map(p => {
                 if (p.id === postId) {
                     return {

@@ -75,16 +75,40 @@ ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE saved_quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_stats ENABLE ROW LEVEL SECURITY;
 
--- NOTE: These policies use permissive rules for now since Clerk IDs (not Supabase Auth)
--- are used as user_id. User isolation is enforced at the application layer via Clerk.
--- To fully secure with RLS, integrate Clerk JWTs with Supabase and use:
---   (auth.jwt() ->> 'sub') = user_id
--- For production, consider migrating DB calls to server-side API routes
--- so the anon key is never exposed to the client.
+-- Drop insecure policies if they exist (to allow re-running this script safely)
+DROP POLICY IF EXISTS "Allow all for mood_entries" ON mood_entries;
+DROP POLICY IF EXISTS "Allow all for chat_sessions" ON chat_sessions;
+DROP POLICY IF EXISTS "Allow all for chat_messages" ON chat_messages;
+DROP POLICY IF EXISTS "Allow all for saved_quotes" ON saved_quotes;
+DROP POLICY IF EXISTS "Allow all for user_stats" ON user_stats;
 
-CREATE POLICY "Allow all for mood_entries" ON mood_entries FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for chat_sessions" ON chat_sessions FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for chat_messages" ON chat_messages FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for saved_quotes" ON saved_quotes FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for user_stats" ON user_stats FOR ALL USING (true) WITH CHECK (true);
+-- Secure Policies
+-- Enforce user isolation using Clerk's 'sub' claim
 
+CREATE POLICY "Users can access their own mood entries" ON mood_entries
+FOR ALL USING ((auth.jwt() ->> 'sub') = user_id)
+WITH CHECK ((auth.jwt() ->> 'sub') = user_id);
+
+CREATE POLICY "Users can access their own chat sessions" ON chat_sessions
+FOR ALL USING ((auth.jwt() ->> 'sub') = user_id)
+WITH CHECK ((auth.jwt() ->> 'sub') = user_id);
+
+CREATE POLICY "Users can access their own chat messages" ON chat_messages
+FOR ALL USING (
+  session_id IN (
+    SELECT id FROM chat_sessions WHERE user_id = (auth.jwt() ->> 'sub')
+  )
+)
+WITH CHECK (
+  session_id IN (
+    SELECT id FROM chat_sessions WHERE user_id = (auth.jwt() ->> 'sub')
+  )
+);
+
+CREATE POLICY "Users can access their own saved quotes" ON saved_quotes
+FOR ALL USING ((auth.jwt() ->> 'sub') = user_id)
+WITH CHECK ((auth.jwt() ->> 'sub') = user_id);
+
+CREATE POLICY "Users can access their own stats" ON user_stats
+FOR ALL USING ((auth.jwt() ->> 'sub') = user_id)
+WITH CHECK ((auth.jwt() ->> 'sub') = user_id);
